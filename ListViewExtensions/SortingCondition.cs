@@ -53,7 +53,7 @@ namespace ListViewExtensions
 
 		#region IEquatable
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return base.Equals(obj as SortingCondition);
 		}
@@ -63,7 +63,7 @@ namespace ListViewExtensions
 			return PropertyName.GetHashCode();
 		}
 
-		public bool Equals(SortingCondition other)
+		public bool Equals(SortingCondition? other)
 		{
 			if(other != null)
 				return this.PropertyName == other.PropertyName && this.Direction == other.Direction;

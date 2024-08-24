@@ -19,7 +19,7 @@ namespace ListViewExtensions.ViewModels
 		/// コンストラクタ
 		/// </summary>
 		/// <param name="dispatcher">UIのDispatcher</param>
-		public UIObservableCollection(Dispatcher dispatcher) : this(Enumerable.Empty<T>(), dispatcher) { }
+		public UIObservableCollection(Dispatcher dispatcher) : this([], dispatcher) { }
 
 		/// <summary>
 		/// コンストラクタ
@@ -36,8 +36,8 @@ namespace ListViewExtensions.ViewModels
 		/// <param name="priority">Dispatcherの優先度</param>
 		public UIObservableCollection(IEnumerable<T> collection, Dispatcher dispatcher, DispatcherPriority priority) : base(collection)
 		{
-			Dispatcher = dispatcher;
-			DispatcherPriority = priority;
+			_Dispatcher = dispatcher;
+			_DispatcherPriority = priority;
 		}
 
 		#endregion

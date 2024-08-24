@@ -18,7 +18,7 @@ namespace ListViewExtensions.Models
 		const string IndexerName = "Item[]";
 
 		protected Synchronizer Sync { get; } = new Synchronizer();
-		List<T> items = new List<T>();
+		readonly List<T> items = new List<T>();
 
 		#region Constructor
 
@@ -33,9 +33,6 @@ namespace ListViewExtensions.Models
 		/// <param name="collection"></param>
 		public SyncedObservableCollection(IEnumerable<T> collection)
 		{
-			if(collection == null)
-				throw new ArgumentNullException(nameof(collection));
-
 			items.AddRange(collection);
 		}
 
@@ -89,7 +86,7 @@ namespace ListViewExtensions.Models
 		/// </summary>
 		/// <param name="value">アイテム</param>
 		/// <returns>含まれていればtrue</returns>
-		bool System.Collections.IList.Contains(object value) => Contains((T)value);
+		bool System.Collections.IList.Contains(object? value) => Contains((T)(value ?? throw new ArgumentNullException(nameof(value))));
 
 		/// <summary>
 		/// 指定したアイテムのインデックスを調べるメソッド
@@ -120,7 +117,7 @@ namespace ListViewExtensions.Models
 		/// </summary>
 		/// <param name="value">アイテム</param>
 		/// <returns>インデックス</returns>
-		int System.Collections.IList.IndexOf(object value) => IndexOf((T)value);
+		int System.Collections.IList.IndexOf(object? value) => IndexOf((T)(value ?? throw new ArgumentNullException(nameof(value))));
 
 		/// <summary>
 		/// 自分自身を指定した配列にコピーするメソッド
@@ -167,10 +164,10 @@ namespace ListViewExtensions.Models
 			}
 		}
 
-		object System.Collections.IList.this[int index]
+		object? System.Collections.IList.this[int index]
 		{
 			get => this[index];
-			set => this[index] = (T)value;
+			set => this[index] = (T)(value ?? throw new ArgumentNullException(nameof(value)));
 		}
 
 		protected virtual T GetItem(int index) => items[index];
@@ -195,8 +192,10 @@ namespace ListViewExtensions.Models
 		/// </summary>
 		/// <param name="value">追加するアイテム</param>
 		/// <returns>追加された位置</returns>
-		int System.Collections.IList.Add(object value)
+		int System.Collections.IList.Add(object? value)
 		{
+			if(value == null) throw new ArgumentNullException(nameof(value));
+
 			return Sync.UpgradeableReadWithLock(() => {
 				var index = this.Count;
 				Add((T)value);
@@ -228,9 +227,9 @@ namespace ListViewExtensions.Models
 		/// </summary>
 		/// <param name="index">挿入する位置</param>
 		/// <param name="value">挿入するアイテム</param>
-		void System.Collections.IList.Insert(int index, object value)
+		void System.Collections.IList.Insert(int index, object? value)
 		{
-			Insert(index, (T)value);
+			Insert(index, (T)(value ?? throw new ArgumentNullException(nameof(value))));
 		}
 
 		/// <summary>
@@ -289,9 +288,9 @@ namespace ListViewExtensions.Models
 		/// 指定のアイテムを削除するメソッド
 		/// </summary>
 		/// <param name="value">削除したいアイテム</param>
-		void System.Collections.IList.Remove(object value)
+		void System.Collections.IList.Remove(object? value)
 		{
-			Remove((T)value);
+			Remove((T)(value ?? throw new ArgumentNullException(nameof(value))));
 		}
 
 		/// <summary>
@@ -434,7 +433,7 @@ namespace ListViewExtensions.Models
 		/// <summary>
 		/// プロパティ変更時のイベント
 		/// </summary>
-		public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler? PropertyChanged;
 
 		/// <summary>
 		/// プロパティが変化したときにこのメソッドを呼ぶ
@@ -461,7 +460,7 @@ namespace ListViewExtensions.Models
 		/// <summary>
 		/// コレクション変更時のイベント
 		/// </summary>
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
+		public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
 		/// <summary>
 		/// コレクションが変更通知を発火するメソッド
@@ -554,19 +553,5 @@ namespace ListViewExtensions.Models
 		}
 
 		#endregion
-		/*
-		#region Lock on External
-
-		/// <summary>
-		/// 昇格可能読み取りロックをしてデータを読み書きするメソッド
-		/// </summary>
-		/// <param name="action">読み取り中にやるプロセス</param>
-		public void ActionWithLock(Action action)
-		{
-			Sync.UpgradeableReadWithLock(action);
-		}
-
-		#endregion
-		*/
 	}
 }

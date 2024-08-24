@@ -17,8 +17,8 @@ namespace ListViewExtensions.Views.Controls
 {
     public class SortedHeader : ContentControl
     {
-		Polygon AscendingArrow;
-		Polygon DescendingArrow;
+		Polygon? AscendingArrow;
+		Polygon? DescendingArrow;
 
 		static SortedHeader()
         {

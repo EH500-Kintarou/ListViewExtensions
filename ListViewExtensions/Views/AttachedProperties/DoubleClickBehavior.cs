@@ -25,16 +25,14 @@ namespace ListViewExtensions.Views.AttachedProperties
 			typeof(ICommand),
 			typeof(DoubleClickBehavior),
 			new FrameworkPropertyMetadata(null, (sender, e)=> {
-				Control ctrl = sender as Control;
-
-				if(ctrl != null) {
-					ICommand oldCommand = (ICommand)e.OldValue;
-					ICommand newCommand = (ICommand)e.NewValue;
+				if(sender is Control ctrl) {
+					var oldCommand = (ICommand?)e.OldValue;
+					var newCommand = (ICommand?)e.NewValue;
 
 					if((oldCommand != null) && (newCommand == null))	//購読を停止
 						ctrl.MouseDoubleClick -= Control_MouseDoubleClick_ForCommand;
 					if((oldCommand == null) && (newCommand != null))    //購読を開始
-						ctrl.MouseDoubleClick += Control_MouseDoubleClick_ForCommand; ;
+						ctrl.MouseDoubleClick += Control_MouseDoubleClick_ForCommand;
 				}
 			}));
 
@@ -67,30 +65,30 @@ namespace ListViewExtensions.Views.AttachedProperties
 			typeof(string),
 			typeof(DoubleClickBehavior),
 			new FrameworkPropertyMetadata(null, (sender, e) => {
-				Control ctrl = sender as Control;
-				object target = ctrl != null ? GetMethodTarget(ctrl) : null;
+				var ctrl = sender as Control;
+				var target = ctrl != null ? GetMethodTarget(ctrl) : null;
 
 				if(ctrl != null && target != null) {
 					string oldName = (string)e.OldValue;
 					string newName = (string)e.NewValue;
 
-					MethodInfo[] oldMethods = string.IsNullOrEmpty(oldName) ?
-						new MethodInfo[] { null, null } :
-						new[] {
-							target.GetType().GetMethod(oldName, new[] { typeof(MouseEventArgs) }),
+					MethodInfo?[] oldMethods = string.IsNullOrEmpty(oldName) ?
+						[null, null] :
+						[
+							target.GetType().GetMethod(oldName, [ typeof(MouseEventArgs) ]),
 							target.GetType().GetMethod(oldName, Type.EmptyTypes)
-						};
-					MethodInfo[] newMethods = string.IsNullOrEmpty(newName) ?
-						new MethodInfo[] { null, null } :
-						new[] {
-							target.GetType().GetMethod(newName, new[] { typeof(MouseEventArgs) }),
+						];
+					MethodInfo?[] newMethods = string.IsNullOrEmpty(newName) ?
+						[null, null] :
+						[
+							target.GetType().GetMethod(newName, [ typeof(MouseEventArgs) ]),
 							target.GetType().GetMethod(newName, Type.EmptyTypes)
-						};
+						];
 
 					if(oldMethods.Any(p => p != null) && newMethods.All(p => p == null))    //購読を停止
 						ctrl.MouseDoubleClick -= Control_MouseDoubleClick_ForMethod;
 					if(oldMethods.All(p => p == null) && newMethods.Any(p => p != null))    //購読を開始
-						ctrl.MouseDoubleClick += Control_MouseDoubleClick_ForMethod; ;
+						ctrl.MouseDoubleClick += Control_MouseDoubleClick_ForMethod;
 				}
 			}));
 
@@ -113,21 +111,21 @@ namespace ListViewExtensions.Views.AttachedProperties
 			typeof(object),
 			typeof(DoubleClickBehavior),
 			new FrameworkPropertyMetadata(null, (sender, e) => {
-				Control ctrl = sender as Control;
-				string methodname = ctrl != null ? GetMethodName(ctrl) : null;
+				var ctrl = sender as Control;
+				var methodname = ctrl != null ? GetMethodName(ctrl) : null;
 
 				if(ctrl != null && !string.IsNullOrEmpty(methodname)) {
-					object oldTarget = (object)e.OldValue;
-					object newTarget = (object)e.NewValue;
+					var oldTarget = e.OldValue;
+					var newTarget = e.NewValue;
 
-					MethodInfo[] oldMethods = new[] {
-						oldTarget?.GetType()?.GetMethod(methodname, new[] { typeof(MouseEventArgs) }),
+					MethodInfo?[] oldMethods = [
+						oldTarget?.GetType()?.GetMethod(methodname, [ typeof(MouseEventArgs) ]),
 						oldTarget?.GetType()?.GetMethod(methodname, Type.EmptyTypes)
-					};
-					MethodInfo[] newMethods = new[] {
-						newTarget?.GetType()?.GetMethod(methodname, new[] { typeof(MouseEventArgs) }),
+					];
+					MethodInfo?[] newMethods = [
+						newTarget?.GetType()?.GetMethod(methodname, [ typeof(MouseEventArgs) ]),
 						newTarget?.GetType()?.GetMethod(methodname, Type.EmptyTypes)
-					};
+					];
 
 					if(oldMethods.Any(p => p != null) && newMethods.All(p => p == null))    //購読を停止
 						ctrl.MouseDoubleClick -= Control_MouseDoubleClick_ForMethod;
@@ -155,15 +153,13 @@ namespace ListViewExtensions.Views.AttachedProperties
 			object target = GetMethodTarget(ctrl);
 			string methodname = GetMethodName(ctrl);
 
-			MethodInfo[] methods = new[] {
-				target.GetType().GetMethod(methodname, new[] { typeof(MouseEventArgs) }),
-				target.GetType().GetMethod(methodname, Type.EmptyTypes)
-			};
+			var methodWithArgs = target.GetType().GetMethod(methodname, [typeof(MouseEventArgs)]);
+			var methodWithNoArgs = target.GetType().GetMethod(methodname, Type.EmptyTypes);
 
-			if(methods[0] != null)
-				methods[0].Invoke(target, new object[] { e });
-			else if(methods[1] != null)
-				methods[1].Invoke(target, new object[] { });
+			if(methodWithArgs != null)
+				methodWithArgs.Invoke(target, [e]);
+			else if(methodWithNoArgs != null)
+				methodWithNoArgs.Invoke(target, []);
 		}
 
 		#endregion

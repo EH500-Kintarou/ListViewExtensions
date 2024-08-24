@@ -25,10 +25,10 @@ namespace ListViewExtensions.ViewModels.Commands
 			CanExecuteChanged?.Invoke(this, new EventArgs());
 		}
 
-		public event EventHandler CanExecuteChanged;
+		public event EventHandler? CanExecuteChanged;
 
-		public bool CanExecute(object parameter) => CanExecuteFunc();
+		public bool CanExecute(object? parameter) => CanExecuteFunc();
 
-		public void Execute(object parameter) => ExecuteAction();
+		public void Execute(object? parameter) => ExecuteAction();
 	}
 }

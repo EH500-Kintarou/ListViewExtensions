@@ -36,12 +36,12 @@ namespace ListViewExtensions.ViewModels
 
 		#region Source/Target Watcher
 
-		private void Target_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void Target_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
 		{
 			RaiseCollectionChanged(e);
 		}
 
-		private void Target_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void Target_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
 			switch(e.PropertyName) {
 				case nameof(Target.Dispatcher):
@@ -53,30 +53,33 @@ namespace ListViewExtensions.ViewModels
 			}
 		}
 
-		private void Source_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void Source_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
 		{
+			var oldItemsCount = e.OldItems?.Count ?? 0;
+			var newItemsCount = e.NewItems?.Count ?? 0;
+
 			switch(e.Action) {
 				case NotifyCollectionChangedAction.Add:
-					Target.InsertRange(e.NewStartingIndex, e.NewItems.Cast<TModel>().Select(p => Converter(p)));
+					Target.InsertRange(e.NewStartingIndex, e.NewItems?.Cast<TModel>()?.Select(p => Converter(p)) ?? []);
 					break;
 				case NotifyCollectionChangedAction.Move:
-					Target.MoveRange(e.OldStartingIndex, e.NewStartingIndex, e.OldItems.Count);
+					Target.MoveRange(e.OldStartingIndex, e.NewStartingIndex, oldItemsCount);
 					break;
 				case NotifyCollectionChangedAction.Remove:
-					TViewModel[] removed = new TViewModel[e.OldItems.Count];
-					for(int i = 0; i < e.OldItems.Count; i++)
+					TViewModel[] removed = new TViewModel[oldItemsCount];
+					for(int i = 0; i < oldItemsCount; i++)
 						removed[i] = Target[e.OldStartingIndex + i];
 										
-					Target.RemoveRange(e.OldStartingIndex, e.OldItems.Count);
+					Target.RemoveRange(e.OldStartingIndex, oldItemsCount);
 
 					foreach(var rd in removed.OfType<IDisposable>().Where(p => p != null))
 						rd.Dispose();
 
 					break;
 				case NotifyCollectionChangedAction.Replace:
-					for(int i = 0; i < e.NewItems.Count; i++) {
+					for(int i = 0; i < newItemsCount; i++) {
 						var r = Target[e.NewStartingIndex + i];
-						Target[e.NewStartingIndex + i] = Converter((TModel)e.NewItems[i]);
+						Target[e.NewStartingIndex + i] = Converter((TModel)(e.NewItems?[i] ?? throw new ArgumentNullException("TModel must not be null")));
 						if(r is IDisposable rd)
 							rd.Dispose();
 					}
@@ -85,7 +88,7 @@ namespace ListViewExtensions.ViewModels
 					var buf = Target.ToArray();
 
 					Target.Clear();
-					Target.AddRange(e.NewItems?.Cast<TModel>()?.Select(p => Converter(p)) ?? Enumerable.Empty<TViewModel>());
+					Target.AddRange(e.NewItems?.Cast<TModel>()?.Select(p => Converter(p)) ?? []);
 
 					foreach(var item in buf.OfType<IDisposable>().Where(p => p != null))
 						item.Dispose();
@@ -252,7 +255,7 @@ namespace ListViewExtensions.ViewModels
 		/// <summary>
 		/// プロパティが変更された際に発生するイベントです。
 		/// </summary>
-		public event NotifyCollectionChangedEventHandler CollectionChanged;
+		public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
 		#endregion
 
@@ -271,7 +274,7 @@ namespace ListViewExtensions.ViewModels
 		/// <summary>
 		/// コレクションが変更された際に発生するイベントです。
 		/// </summary>
-		public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler? PropertyChanged;
 
 		#endregion
 
@@ -298,7 +301,7 @@ namespace ListViewExtensions.ViewModels
 				Target.CollectionChanged -= Target_CollectionChanged;
 				Target.PropertyChanged -= Target_PropertyChanged;
 
-				foreach(var item in Target.Where(p => p is IDisposable).Select(p => (IDisposable)p))
+				foreach(var item in Target.OfType<IDisposable>())
 					item.Dispose();
 				Target.Clear();
 			}

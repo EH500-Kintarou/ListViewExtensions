@@ -13,14 +13,9 @@ namespace ListViewExtensions.Views.Converters
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			SortingCondition condition = value as SortingCondition;
-			string PropertyName = parameter as string;
-
-			if(condition == null)
-				condition = SortingCondition.None;
-			if(PropertyName == null)
-				throw new ArgumentException(nameof(parameter));
-
+			var condition = value as SortingCondition ?? SortingCondition.None;
+			var PropertyName = parameter as string ?? throw new ArgumentException(nameof(parameter));
+			
 			if(condition.PropertyName == PropertyName)
 				return condition.Direction;
 			else
@@ -29,16 +24,8 @@ namespace ListViewExtensions.Views.Converters
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			SortingDirection direction;
-			if(value is SortingDirection)
-				direction = (SortingDirection)value;
-			else
-				direction = SortingDirection.None;
-			
-			string PropertyName = parameter as string;
-
-			if(PropertyName == null)
-				throw new ArgumentException(nameof(parameter));
+			if(value is not SortingDirection direction) direction = SortingDirection.None;
+			var PropertyName = parameter as string ?? throw new ArgumentException(nameof(parameter));
 
 			if(direction == SortingDirection.None)
 				return SortingCondition.None;

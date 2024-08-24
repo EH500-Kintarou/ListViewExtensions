@@ -14,7 +14,7 @@ namespace ListViewExtensions.Models
 	{
 		public SortableObservableCollection(IEnumerable<T> collection) : base(collection)
 		{
-			SortingCondition = SortingCondition.None;
+			_SortingCondition = SortingCondition.None;
 
 			foreach(var item in this)
 				StartListeningIfNotifyPropertyChanged(item);
@@ -47,18 +47,13 @@ namespace ListViewExtensions.Models
 		/// <param name="direction">ソートする方向</param>
 		public void Sort(string propertyName, SortingDirection direction)
 		{
-			if(string.IsNullOrEmpty(propertyName))
-				throw new ArgumentNullException(nameof(propertyName));
 			if(direction == SortingDirection.None)
 				throw new ArgumentException($"\"{nameof(direction)}\" must not be None.");
 
-			PropertyInfo property = typeof(T).GetProperty(propertyName);
-
-			if(property == null)
-				throw new ArgumentException($"\"{propertyName}\" doesn't exist.");
+			var property = typeof(T).GetProperty(propertyName) ?? throw new ArgumentException($"\"{propertyName}\" doesn't exist.");
 
 			Sync.UpgradeableReadWithLock(() => {
-				var Sorted = this.OrderByDirection(p => property.GetValue(p), direction, Comparer<object>.Create((x, y) => CompareProperty(x, y, propertyName))).ToArray();
+				var Sorted = this.OrderByDirection(p => property.GetValue(p), direction, Comparer<object?>.Create((x, y) => CompareProperty(x, y, propertyName))).ToArray();
 				Sync.WriteWithLock(() => {
 					for(int i = 0; i < Sorted.Length; i++) {
 						int oldindex = this.IndexOf(Sorted[i], i);
@@ -81,10 +76,10 @@ namespace ListViewExtensions.Models
 		/// <param name="y">2つ目のプロパティの値</param>
 		/// <param name="propertyName">プロパティ名</param>
 		/// <returns>x > yなら正、x == yなら0、x < yなら負の値</returns>
-		public virtual int CompareProperty(object x, object y, string propertyName)
+		public virtual int CompareProperty(object? x, object? y, string propertyName)
 		{
-			if(x is IComparable && y is IComparable)
-				return ((IComparable)x).CompareTo(y);
+			if(x is IComparable xc && y is IComparable yc)
+				return xc.CompareTo(yc);
 			else
 				return 0;
 		}
@@ -108,12 +103,10 @@ namespace ListViewExtensions.Models
 		/// <returns>合致していればtrue、していなければfalse</returns>
 		private bool IsSorted(SortingCondition condition)
 		{
-			if(condition == null)
-				throw new ArgumentNullException(nameof(condition));
 			if(condition.IsNone || this.Count <= 1)
 				return true;    //条件が無かったり個数が1個以下だったらソートされているといえる
 
-			PropertyInfo property = typeof(T).GetProperty(condition.PropertyName);
+			var property = typeof(T).GetProperty(condition.PropertyName) ?? throw new ArgumentException($"{nameof(condition)}.{nameof(condition.PropertyName)} is not found.", nameof(condition));
 			var properties = Sync.ReadWithLock(() => this.Select(p => property.GetValue(p)).ToArray());
 			var compare = properties.Zip(properties.Skip(1), (x, y) => CompareProperty(x, y, condition.PropertyName));
 
@@ -143,11 +136,10 @@ namespace ListViewExtensions.Models
 				if(SortingCondition.IsNone) //ソートされていなかったら
 					Add(item);
 				else {
-					PropertyInfo property = typeof(T).GetProperty(SortingCondition.PropertyName);
-
+					var property = typeof(T).GetProperty(SortingCondition.PropertyName) ?? throw new ArgumentException($"{nameof(SortingCondition)}.{nameof(SortingCondition.PropertyName)} is not found.");
 					var index = this
-						.Concat(new[] { item })
-						.OrderByDirection(p => property.GetValue(p), SortingCondition.Direction, Comparer<object>.Create((x, y) => CompareProperty(x, y, SortingCondition.PropertyName)))
+						.Concat([item])
+						.OrderByDirection(p => property.GetValue(p), SortingCondition.Direction, Comparer<object?>.Create((x, y) => CompareProperty(x, y, SortingCondition.PropertyName)))
 						.ToList()
 						.IndexOf(item);
 
@@ -218,7 +210,7 @@ namespace ListViewExtensions.Models
 				propertychanged.PropertyChanged -= Element_PropertyChanged;
 		}
 
-		private void Element_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void Element_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
 			if(e.PropertyName == SortingCondition.PropertyName)
 				CollectionOrderMayBeChanged();

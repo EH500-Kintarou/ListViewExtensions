@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp3.1;net6.0-windows</TargetFrameworks>
-    <UseWPF>true</UseWPF>
+    <LangVersion>12</LangVersion>
+	<UseWPF>true</UseWPF>
     <Title>ListView Extensions</Title>
     <Description>The library which supports the implementation of the MVVM pattern in WPF ListView.</Description>
 	<Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
@@ -13,6 +14,7 @@
 	<RepositoryUrl>https://github.com/EH500-Kintarou/ListViewExtensions</RepositoryUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

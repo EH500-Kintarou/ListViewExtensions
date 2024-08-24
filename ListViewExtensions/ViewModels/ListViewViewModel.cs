@@ -33,7 +33,7 @@ namespace ListViewExtensions.ViewModels
 			Source = source;
 			Source.PropertyChanged += Source_PropertyChanged;
 			this.CollectionChanged += ListViewViewModel_CollectionChanged;
-			SortingCondition = Source.SortingCondition;
+			_SortingCondition = Source.SortingCondition;
 			UseNonUIThreadWhenCallingModel = false;
 			DisableCommandWhenCommandTaskRunning = false;
 			CommandTaskRunning = false;
@@ -95,15 +95,17 @@ namespace ListViewExtensions.ViewModels
 
 			SortByPropertyCommand = new ParameterCommand<string>(
 				propertyName => !(DisableCommandWhenCommandTaskRunning && CommandTaskRunning),
-				propertyName => 
-				SafetySourceAccessIfAvailable(() => {
-					CommandTaskRunning = true;
-					if(SortingCondition.PropertyName == propertyName && SortingCondition.Direction == SortingDirection.Ascending)
-						Source.Sort(propertyName, SortingDirection.Descending);
-					else
-						Source.Sort(propertyName, SortingDirection.Ascending);
-					CommandTaskRunning = false;
-				})
+				propertyName => {
+					if(propertyName != null)
+						SafetySourceAccessIfAvailable(() => {
+							CommandTaskRunning = true;
+							if(SortingCondition.PropertyName == propertyName && SortingCondition.Direction == SortingDirection.Ascending)
+								Source.Sort(propertyName, SortingDirection.Descending);
+							else
+								Source.Sort(propertyName, SortingDirection.Ascending);
+							CommandTaskRunning = false;
+						});
+				}
 			);
 
 			ToggleSelectionCommand = new Command(() => this.Count > 0, ()=>{
@@ -112,14 +114,14 @@ namespace ListViewExtensions.ViewModels
 			});
 		}
 
-		private void ListViewViewModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void ListViewViewModel_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
 		{
 			RaiseRemoveSelectedItemCanExecuteChanged();
 			RaiseMoveSelectedItemCanExecuteChanged();
 			RaiseToggleSelectionCanExecuteChanged();
 		}
 
-		private void Source_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void Source_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
 			switch(e.PropertyName) {
 				case nameof(Source.SortingCondition):
@@ -186,7 +188,7 @@ namespace ListViewExtensions.ViewModels
 		/// <summary>
 		/// ListView.SelectedItemsにバインディングして現在の選択中のアイテムを知らせます
 		/// </summary>
-		public System.Collections.IList SelectedItemsSetter
+		public System.Collections.IList? SelectedItemsSetter
 		{
 			//get { return _SelectedItems; }
 			set
@@ -212,25 +214,27 @@ namespace ListViewExtensions.ViewModels
 				RaiseMoveSelectedItemCanExecuteChanged();
 			}
 		}
-		private System.Collections.IList _SelectedItemsSetter;
+		private System.Collections.IList? _SelectedItemsSetter;
 
 		#endregion
 
-		private void SelectedItemsSetter_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void SelectedItemsSetter_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
 		{
 			switch(e.Action) {
 				case NotifyCollectionChangedAction.Add:
-					_SelectedItems.InsertRange(e.NewStartingIndex, e.NewItems.Cast<TViewModel>());
+					_SelectedItems.InsertRange(e.NewStartingIndex, e.NewItems?.Cast<TViewModel>() ?? []);
 					break;
 				case NotifyCollectionChangedAction.Move:
 					_SelectedItems.Move(e.OldStartingIndex, e.NewStartingIndex);
 					break;
 				case NotifyCollectionChangedAction.Remove:
-					foreach(var r in e.OldItems)
-						_SelectedItems.RemoveAt(e.OldStartingIndex);
+					if(e.OldItems != null) {
+						foreach(var r in e.OldItems)
+							_SelectedItems.RemoveAt(e.OldStartingIndex);
+					}
 					break;
 				case NotifyCollectionChangedAction.Replace:
-					foreach(var r in e.OldItems.Cast<TViewModel>().Zip(e.NewItems.Cast<TViewModel>(), (o, n) => new { Old = o, New = n }))
+					foreach(var r in e.OldItems?.Cast<TViewModel>()?.Zip(e.NewItems?.Cast<TViewModel>() ?? [], (o, n) => new { Old = o, New = n }) ?? [])
 						_SelectedItems[_SelectedItems.IndexOf(r.Old)] = r.New;
 					break;
 				case NotifyCollectionChangedAction.Reset:
@@ -239,19 +243,11 @@ namespace ListViewExtensions.ViewModels
 					break;
 			}
 
-			/*
-			//一応念のため確認
-			if(!SelectedItems.SequenceEqual(_SelectedItemsSetter.Cast<TViewModel>())) {
-				_SelectedItems.Clear();
-				_SelectedItems.AddRange(_SelectedItemsSetter.Cast<TViewModel>());
-			}
-			*/
-
 			RaiseRemoveSelectedItemCanExecuteChanged();
 			RaiseMoveSelectedItemCanExecuteChanged();
 		}
 
-		ObservableCollection<TViewModel> _SelectedItems = new ObservableCollection<TViewModel>();
+		readonly ObservableCollection<TViewModel> _SelectedItems = new ObservableCollection<TViewModel>();
 
 		/// <summary>
 		/// 選択中の項目をIListじゃ使いにくいから使いやすくミラーリングしたクラス
@@ -265,7 +261,7 @@ namespace ListViewExtensions.ViewModels
 				return _ReadOnlySelectedItems;
 			}
 		}
-		private ReadOnlyObservableCollection<TViewModel> _ReadOnlySelectedItems;
+		private ReadOnlyObservableCollection<TViewModel>? _ReadOnlySelectedItems;
 
 		#region Methods that change selection
 
@@ -278,9 +274,11 @@ namespace ListViewExtensions.ViewModels
 			if(item == null)
 				throw new ArgumentNullException(nameof(item));
 			if(!this.Contains(item))
-				throw new ArgumentException("This collection doesn't contain the item,");
+				throw new ArgumentException("This collection doesn't contain the item.", nameof(item));
 			if(_SelectedItems.Contains(item))
 				throw new InvalidOperationException("Already selected.");
+			if(_SelectedItemsSetter == null)
+				throw new InvalidOperationException($"{nameof(_SelectedItemsSetter)} is not set yet.");
 
 			if(Dispatcher.CheckAccess())
 				_SelectedItemsSetter.Add(item);
@@ -306,11 +304,13 @@ namespace ListViewExtensions.ViewModels
 				throw new ArgumentException("This collection doesn't contain the item,");
 			if(!_SelectedItems.Contains(item))
 				throw new InvalidOperationException("Already selected.");
+			if(_SelectedItemsSetter == null)
+				throw new InvalidOperationException($"{nameof(_SelectedItemsSetter)} is not set yet.");
 
 			if(Dispatcher.CheckAccess())
 				_SelectedItemsSetter.Remove(item);
 			else
-				Dispatcher.Invoke(DispatcherPriority, (Action)(() => _SelectedItemsSetter.Remove(item)));
+				Dispatcher.Invoke(DispatcherPriority, () => _SelectedItemsSetter.Remove(item));
 		}
 
 		/// <summary>
