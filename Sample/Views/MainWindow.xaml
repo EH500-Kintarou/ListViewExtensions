@@ -1,0 +1,113 @@
+﻿<Window x:Class="Sample.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+		xmlns:lv="http://schemas.eh500-kintarou.com/ListViewExtensions"
+        xmlns:v="clr-namespace:Sample.Views"
+        xmlns:vm="clr-namespace:Sample.ViewModels"
+        Title="MainWindow" Height="480" Width="640">
+
+	<Window.DataContext>
+		<vm:MainWindowViewModel/>
+	</Window.DataContext>
+
+	<i:Interaction.Triggers>
+
+		<!--Viewに特別な要件が存在しない限りは、トリガーやアクションの自作にこだわらず積極的にコードビハインドを使いましょう -->
+		<!--Viewのコードビハインドは、基本的にView内で完結するロジックとViewModelからのイベントの受信(専用リスナを使用する)に限るとトラブルが少なくなります -->
+		<!--Livet1.1からはコードビハインドでViewModelのイベントを受信するためのWeakEventLisnterサポートが追加されています -->
+
+		<!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
+		<i:EventTrigger EventName="ContentRendered">
+			<l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Initialize"/>
+		</i:EventTrigger>
+
+		<!--Windowが閉じたタイミングでViewModelのDisposeメソッドが呼ばれます-->
+		<i:EventTrigger EventName="Closed">
+			<l:DataContextDisposeAction/>
+		</i:EventTrigger>
+
+		<!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
+
+	</i:Interaction.Triggers>
+
+	<DockPanel Margin="10">
+		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
+			<Button Margin="0,0,10,0" Content="Add" Width="75" >
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="Click">
+						<l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Add" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</Button>
+			<Button Margin="0,0,10,0" Content="Remove" Width="75" Command="{Binding People.RemoveSelectedItemCommand}" />
+			<Button Margin="0,0,10,0" Content="Clear All" Width="75" >
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="Click">
+						<l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ClearAll" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</Button>
+			<Button Margin="0,0,10,0" Content="Up" Width="75" Command="{Binding People.MoveUpSelectedItemCommand}" />
+			<Button Margin="0,0,10,0" Content="Down" Width="75" Command="{Binding People.MoveDownSelectedItemCommand}" />
+			<Button Margin="0,0,10,0" Content="Toggle Selection" Width="110" Command="{Binding People.ToggleSelectionCommand}" />
+		</StackPanel>
+
+		<ListView ItemsSource="{Binding People}" >
+			<ListView.Resources>
+				<lv:SortingConditionConverter x:Key="ConditionToDirectionConverter" />
+			</ListView.Resources>
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Width="120" DisplayMemberBinding="{Binding Name}">
+						<GridViewColumnHeader Command="{Binding People.SortByPropertyCommand}" CommandParameter="Name" >
+							<lv:SortedHeader Content="Name" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Name'}" />
+						</GridViewColumnHeader>
+					</GridViewColumn>
+					<GridViewColumn Width="150" DisplayMemberBinding="{Binding Pronunciation}" >
+						<GridViewColumnHeader Command="{Binding People.SortByPropertyCommand}" CommandParameter="Pronunciation" >
+							<lv:SortedHeader Content="Pronunciation" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Pronunciation'}" />
+						</GridViewColumnHeader>
+					</GridViewColumn>
+					<GridViewColumn Width="70" DisplayMemberBinding="{Binding Age}" >
+						<GridViewColumnHeader Command="{Binding People.SortByPropertyCommand}" CommandParameter="Age" >
+							<lv:SortedHeader Content="Age" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Age'}" />
+						</GridViewColumnHeader>
+					</GridViewColumn>
+					<GridViewColumn Width="120" DisplayMemberBinding="{Binding Birthday}" >
+						<GridViewColumnHeader Command="{Binding People.SortByPropertyCommand}" CommandParameter="Birthday" >
+							<lv:SortedHeader Content="Birthday" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Birthday'}" />
+						</GridViewColumnHeader>
+					</GridViewColumn>
+					<GridViewColumn Width="100" DisplayMemberBinding="{Binding Height}" >
+						<GridViewColumnHeader Command="{Binding People.SortByPropertyCommand}" CommandParameter="Height_cm" >
+							<lv:SortedHeader Content="Height" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Height_cm'}" />
+						</GridViewColumnHeader>
+					</GridViewColumn>
+				</GridView>
+			</ListView.View>
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<Setter Property="ContextMenu">
+						<Setter.Value>
+							<ContextMenu>
+								<MenuItem Header="Increment the age" Command="{Binding IncrementAgeCommand}" />
+								<MenuItem Header="Decrement the age" Command="{Binding DecrementAgeCommand}" />
+							</ContextMenu>
+						</Setter.Value>
+					</Setter>
+					<!--<Setter Property="lv:DoubleClickBehavior.Command" Value="{Binding DoubleClickCommand}" />-->
+					<Setter Property="lv:DoubleClickBehavior.MethodTarget" Value="{Binding}" />
+					<Setter Property="lv:DoubleClickBehavior.MethodName" Value="DoubleClicked" />
+				</Style>
+			</ListView.ItemContainerStyle>
+			<i:Interaction.Triggers>
+				<l:InteractionMessageTrigger Messenger="{Binding Messenger}" MessageKey="SelectedItemsMirroring" >
+					<lv:ListViewSelectedItemsAction Source="{Binding People.SelectedItemsSetter}" />
+				</l:InteractionMessageTrigger>
+			</i:Interaction.Triggers>
+		</ListView>
+	</DockPanel>
+</Window>

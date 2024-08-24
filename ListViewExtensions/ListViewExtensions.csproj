@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFrameworks>net452;netcoreapp3.1;net6.0-windows</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <Title>ListView Extensions</Title>
+    <Description>The library which supports the implementation of the MVVM pattern in WPF ListView.</Description>
+	<Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
+	<Company>EH500_Kintarou</Company>
+	<Authors>EH500_Kintarou</Authors>
+	<VersionPrefix>1.0.1</VersionPrefix>
+	<VersionSuffix></VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+  </ItemGroup>
+
+</Project>
