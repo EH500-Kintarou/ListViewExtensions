@@ -10,6 +10,9 @@
 	<Authors>EH500_Kintarou</Authors>
 	<VersionPrefix>1.0.1</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
+	<RepositoryUrl>https://github.com/EH500-Kintarou/ListViewExtensions</RepositoryUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +21,17 @@
 
   <ItemGroup>
     <Folder Include="Themes\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
