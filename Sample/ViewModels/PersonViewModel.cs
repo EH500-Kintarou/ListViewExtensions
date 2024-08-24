@@ -17,15 +17,15 @@ namespace Sample.ViewModels
 {
 	public class PersonViewModel : ViewModel
 	{
-		Person Source;
+		PersonModel Source;
 
-		public PersonViewModel(Person source)
+		public PersonViewModel(PersonModel source)
 		{
 			Source = source;
 			Source.PropertyChanged += Source_PropertyChanged;
 		}
 
-		private void Source_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void Source_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
 			switch(e.PropertyName) {
 				case nameof(Source.Name):
@@ -50,13 +50,13 @@ namespace Sample.ViewModels
 		{
 		}
 
-		public string Name
+		public string? Name
 		{
 			get { return Source.Name; }
 			set { Source.Name = value; }
 		}
 
-		public string Pronunciation
+		public string? Pronunciation
 		{
 			get { return Source.Pronunciation; }
 			set { Source.Pronunciation = value; }
@@ -86,12 +86,11 @@ namespace Sample.ViewModels
 		{
 			get
 			{
-				if(_IncrementAgeCommand == null)
-					_IncrementAgeCommand = new ViewModelCommand(() => Source.IncrementAge());
+				_IncrementAgeCommand ??= new ViewModelCommand(() => Source.IncrementAge());
 				return _IncrementAgeCommand;
 			}
 		}
-		private ViewModelCommand _IncrementAgeCommand;
+		private ViewModelCommand? _IncrementAgeCommand;
 
 		#endregion
 
@@ -101,12 +100,11 @@ namespace Sample.ViewModels
 		{
 			get
 			{
-				if(_DecrementAgeCommand == null)
-					_DecrementAgeCommand = new ViewModelCommand(() => Source.DecrementAge());
+				_DecrementAgeCommand ??= new ViewModelCommand(() => Source.DecrementAge());
 				return _DecrementAgeCommand;
 			}
 		}
-		private ViewModelCommand _DecrementAgeCommand;
+		private ViewModelCommand? _DecrementAgeCommand;
 
 		#endregion
 

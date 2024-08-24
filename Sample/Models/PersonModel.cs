@@ -7,11 +7,11 @@ using Livet;
 
 namespace Sample.Models
 {
-	public class Person : NotificationObject
+	public class PersonModel : NotificationObject
 	{
 		#region Name変更通知プロパティ
 
-		public string Name
+		public string? Name
 		{
 			get { return _Name; }
 			set
@@ -22,13 +22,13 @@ namespace Sample.Models
 				RaisePropertyChanged(nameof(Name));
 			}
 		}
-		private string _Name;
+		private string? _Name;
 
 		#endregion
 
 		#region Pronunciation変更通知プロパティ
 
-		public string Pronunciation
+		public string? Pronunciation
 		{
 			get { return _Pronunciation; }
 			set
@@ -39,7 +39,7 @@ namespace Sample.Models
 				RaisePropertyChanged(nameof(Pronunciation));
 			}
 		}
-		private string _Pronunciation;
+		private string? _Pronunciation;
 
 		#endregion
 

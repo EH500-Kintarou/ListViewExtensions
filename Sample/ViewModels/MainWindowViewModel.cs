@@ -20,29 +20,29 @@ namespace Sample.ViewModels
 	public class MainWindowViewModel : ViewModel
 	{
 		Random random = new Random();
-		Model model;
+		MainWindowModel? model;
 
 		public void Initialize()
 		{
-			model = Model.GetInstance();
+			model = MainWindowModel.GetInstance();
 
-			People = new ListViewViewModel<PersonViewModel, Person>(model.People, person => new PersonViewModel(person), DispatcherHelper.UIDispatcher);
+			People = new ListViewViewModel<PersonViewModel, PersonModel>(model.People, person => new PersonViewModel(person), DispatcherHelper.UIDispatcher);
 			Messenger.Raise(new InteractionMessage("SelectedItemsMirroring"));
 		}
 
 		public void Add()
 		{
-			model.Add();
+			model?.Add();
 		}
 
 		public void ClearAll()
 		{
-			model.ClearAll();
+			model?.ClearAll();
 		}
 
 		#region People変更通知プロパティ
 
-		public ListViewViewModel<PersonViewModel, Person> People
+		public ListViewViewModel<PersonViewModel, PersonModel>? People
 		{
 			get { return _People; }
 			set
@@ -53,7 +53,7 @@ namespace Sample.ViewModels
 				RaisePropertyChanged(nameof(People));
 			}
 		}
-		private ListViewViewModel<PersonViewModel, Person> _People;
+		private ListViewViewModel<PersonViewModel, PersonModel>? _People;
 
 		#endregion
 	}

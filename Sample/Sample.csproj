@@ -3,7 +3,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
 	<TargetFrameworks>net6.0-windows;net452</TargetFrameworks>
-	<UseWPF>true</UseWPF>
+    <LangVersion>12</LangVersion>
+    <UseWPF>true</UseWPF>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
