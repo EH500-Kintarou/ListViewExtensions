@@ -13,5 +13,8 @@ namespace UnitTest.Models.SortableObservableCollection
 		public int Age { get; set; }
 		public DateTime Birthday { get; set; }
 		public int Height_cm{ get; set; }
+
+		public override string ToString()
+			=> $"{{{Name} ({Pronunciation}), {Age}, {Birthday}, {Height_cm}cm}}";
 	}
 }

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
 using ListViewExtensions.Util;
 
 namespace ListViewExtensions.Models
@@ -96,6 +95,7 @@ namespace ListViewExtensions.Models
 		public void Sort(SortingDirection direction, string? propertyName = null)
 		{
 			Sort(direction, GetPropertyComparer(propertyName));
+			SortingCondition = propertyName == null ? new SortingCondition(direction) : new SortingCondition(propertyName, direction);
 		}
 
 		/// <summary>
@@ -103,47 +103,50 @@ namespace ListViewExtensions.Models
 		/// </summary>
 		/// <param name="direction">ソート方向。Noneの場合は何もしない。</param>
 		/// <param name="comparer">要素同士の比較を提供するComparer</param>
-		public void Sort(SortingDirection direction, IComparer<T> comparer)
+		protected void Sort(SortingDirection direction, IComparer<T> comparer)
 		{
 			Sync.UpgradeableReadWithLock(() => {
-				switch(direction) {
-					case SortingDirection.Ascending:
-						QuickSort(0, this.Count - 1, comparer);
-						break;
-					case SortingDirection.Descending:
-						QuickSort(0, this.Count - 1, new InvertComparer(comparer));
-						break;
+				if(this.Count >= 2) {	// 要素が2個以上あるときにソートを行う（そうでないときはすでにソートされていると言える）
+					switch(direction) {
+						case SortingDirection.Ascending:
+							MergeSort(0, this.Count, comparer);
+							break;
+						case SortingDirection.Descending:
+							MergeSort(0, this.Count, new InvertComparer(comparer));
+							break;
+					}
 				}
 			});
 		}
 
-		private void QuickSort(int left, int right, IComparer<T> comparer)
+		/// <summary>
+		/// マージソートをするクラス
+		/// </summary>
+		/// <param name="left">左端のインデックス（自身を含む）</param>
+		/// <param name="right">右端のインデックス（自身を含まない）</param>
+		/// <param name="comparer">比較子</param>
+		private void MergeSort(int left, int right, IComparer<T> comparer)
 		{
-			do {
-				int i = left;
-				int j = right;
-				T pivot = this[(i + j) >> 1];
-				do {
-					while(i < this.Count && comparer.Compare(this[i], pivot) < 0) i++;
-					while(j >= 0 && comparer.Compare(this[j], pivot) > 0) j--;
-					if(i > j) break;
-					if(i < j) {
-						this.Move(j, i);
-						this.Move(i + 1, j);
-					}
-					i++;
-					j--;
-				} while(i <= j);
-				if(j - left <= right - i) {
-					if(left < j) QuickSort(left, j, comparer);
-					left = i;
-				} else {
-					if(i < right) QuickSort(i, right, comparer);
-					right = j;
-				}
-			} while(left < right);
-		}
+			if(right - left <= 1)
+				return;
 
+			var half = (left + right) >> 1;
+
+			MergeSort(left, half, comparer);
+			MergeSort(half, right, comparer);
+
+			int i = left;
+			int j = half;
+
+			while(i < j && j < right) {
+				if(comparer.Compare(this[i], this[j]) > 0) {
+					this.Move(j, i);
+					j++;
+				}
+				i++;
+			}
+		}
+		
 		private IComparer<T> GetPropertyComparer(string? propertyName)
 		{
 			System.Collections.IComparer? comparer = null;
@@ -284,6 +287,11 @@ namespace ListViewExtensions.Models
 							right = half - 1;
 						else
 							left = half + 1;
+
+						if(left > right) {
+							target = left;
+							break;
+						}
 					} while(true);
 
 					Insert(target, item);
