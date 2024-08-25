@@ -38,7 +38,7 @@ namespace ListViewExtensions.Models
 		{
 			get => Sync.ReadWithLock(() => _SortingCondition);
 			private set => Sync.UpgradeableReadWithLock(() => {
-				if(_SortingCondition == value)
+				if(_SortingCondition.Equals(value))
 					return;
 				Sync.WriteWithLock(() => _SortingCondition = value);
 				RaisePropertyChanged(nameof(SortingCondition));

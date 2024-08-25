@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ListViewExtensions
 {
-	public class SortingCondition : IEquatable<SortingCondition>
+	public struct SortingCondition : IEquatable<SortingCondition>
 	{
 		/// <summary>
 		/// ソート条件なしとして初期化します
@@ -57,7 +58,7 @@ namespace ListViewExtensions
 
 		public override bool Equals(object? obj)
 		{
-			return base.Equals(obj as SortingCondition);
+			return obj != null && base.Equals((SortingCondition)obj);
 		}
 
 		public override int GetHashCode()
@@ -69,12 +70,13 @@ namespace ListViewExtensions
 			return hash;
 		}
 
-		public bool Equals(SortingCondition? other)
+#if(NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER)
+		public bool Equals([AllowNull] SortingCondition other)
+#else
+		public bool Equals(SortingCondition other)
+#endif
 		{
-			if(other != null)
-				return this.PropertyName == other.PropertyName && this.Direction == other.Direction;
-			else
-				return false;
+			return this.PropertyName == other.PropertyName && this.Direction == other.Direction;
 		}
 
 		#endregion

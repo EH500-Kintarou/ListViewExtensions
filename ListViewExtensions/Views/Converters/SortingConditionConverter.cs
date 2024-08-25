@@ -13,24 +13,25 @@ namespace ListViewExtensions.Views.Converters
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			var condition = value as SortingCondition ?? SortingCondition.None;
-			var PropertyName = parameter as string ?? throw new ArgumentException(nameof(parameter));
-			
-			if(condition.PropertyName == PropertyName)
-				return condition.Direction;
+			var propertyName = parameter as string;
+
+			if(value is SortingCondition sc && sc.PropertyName == propertyName)
+				return sc.Direction;
 			else
 				return SortingDirection.None;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if(value is not SortingDirection direction) direction = SortingDirection.None;
-			var PropertyName = parameter as string ?? throw new ArgumentException(nameof(parameter));
+			var propertyName = parameter as string;
 
-			if(direction == SortingDirection.None)
+			if(value is SortingDirection dir) {
+				if(propertyName == null)
+					return new SortingCondition(dir);
+				else
+					return new SortingCondition(propertyName, dir);
+			} else
 				return SortingCondition.None;
-			else
-				return new SortingCondition(PropertyName, direction);
 		}
 	}
 }
