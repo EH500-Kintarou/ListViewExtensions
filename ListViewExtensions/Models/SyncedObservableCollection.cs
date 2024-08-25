@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,22 +19,22 @@ namespace ListViewExtensions.Models
 		const string IndexerName = "Item[]";
 
 		protected Synchronizer Sync { get; } = new Synchronizer();
-		readonly List<T> items = new List<T>();
+		readonly List<T> items;
 
 		#region Constructor
 
 		/// <summary>
 		/// 空のコレクションを生成するコンストラクタ
 		/// </summary>
-		public SyncedObservableCollection() : this(Enumerable.Empty<T>()) { }
+		public SyncedObservableCollection() : this([]) { }
 
 		/// <summary>
 		/// 初期アイテムを指定して生成するコンストラクタ
 		/// </summary>
-		/// <param name="collection"></param>
+		/// <param name="collection">初期アイテム</param>
 		public SyncedObservableCollection(IEnumerable<T> collection)
 		{
-			items.AddRange(collection);
+			items = new List<T>(collection);
 		}
 
 		#endregion
@@ -420,7 +421,7 @@ namespace ListViewExtensions.Models
 
 		#region Enumerator
 
-		public IEnumerator<T> GetEnumerator() => items.ToArray().AsEnumerable().GetEnumerator();
+		public IEnumerator<T> GetEnumerator() => Sync.ReadWithLock(() => items.GetEnumerator());
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
