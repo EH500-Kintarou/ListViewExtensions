@@ -2,26 +2,35 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 using ListViewExtensions.Util;
 
 namespace ListViewExtensions.Models
 {
 	public class SortableObservableCollection<T> : SyncedObservableCollection<T>, ISortableObservableCollection<T>
 	{
-		public SortableObservableCollection(IEnumerable<T> collection) : base(collection)
+		readonly IDictionary<string, System.Collections.IComparer> propertyComparerDictionary;
+
+		public SortableObservableCollection() : this([]) { }
+
+		public SortableObservableCollection(IEnumerable<T> collection) : this(collection, new Dictionary<string, System.Collections.IComparer>()) { }
+
+		public SortableObservableCollection(IDictionary<string, System.Collections.IComparer> propertyComparer) : this([], propertyComparer) { }
+
+		public SortableObservableCollection(IEnumerable<T> collection, IDictionary<string, System.Collections.IComparer> propertyComparer) : base(collection)
 		{
 			_SortingCondition = SortingCondition.None;
+			this.propertyComparerDictionary = propertyComparer;
 
 			foreach(var item in this)
 				StartListeningIfNotifyPropertyChanged(item);
 		}
 		
-		public SortableObservableCollection() : this(Enumerable.Empty<T>()) { }
-
 		#region Sort
 
 		#region SortingCondition変更通知プロパティ
@@ -29,7 +38,7 @@ namespace ListViewExtensions.Models
 		public SortingCondition SortingCondition
 		{
 			get => Sync.ReadWithLock(() => _SortingCondition);
-			set => Sync.UpgradeableReadWithLock(() => {
+			private set => Sync.UpgradeableReadWithLock(() => {
 				if(_SortingCondition == value)
 					return;
 				Sync.WriteWithLock(() => _SortingCondition = value);
@@ -40,11 +49,11 @@ namespace ListViewExtensions.Models
 
 		#endregion
 
-		/// <summary>
-		/// 自身をソートします。
-		/// </summary>
-		/// <param name="propertyName">ソートするプロパティ名</param>
-		/// <param name="direction">ソートする方向</param>
+		#region Sorting Core
+
+		#region Obsolete
+
+		[Obsolete(@"Call ""Sort(SortingDirection, string?)"" instead of this method")]
 		public void Sort(string propertyName, SortingDirection direction)
 		{
 			if(direction == SortingDirection.None)
@@ -68,21 +77,155 @@ namespace ListViewExtensions.Models
 			});
 		}
 
-		/// <summary>
-		/// プロパティの大小関係を調べます。
-		/// ソートをカスタマイズするにはこのメソッドをオーバーライドしてください。
-		/// </summary>
-		/// <param name="x">1つ目のプロパティの値</param>
-		/// <param name="y">2つ目のプロパティの値</param>
-		/// <param name="propertyName">プロパティ名</param>
-		/// <returns>x > yなら正、x == yなら0、x < yなら負の値</returns>
-		public virtual int CompareProperty(object? x, object? y, string propertyName)
+		[Obsolete(@"Call ""Sort(SortingDirection, IComparer<T>)"" to implement custom sorting")]
+		protected virtual int CompareProperty(object? x, object? y, string propertyName)
 		{
 			if(x is IComparable xc && y is IComparable yc)
 				return xc.CompareTo(yc);
 			else
 				return 0;
 		}
+
+		#endregion
+
+		/// <summary>
+		/// 自身をソートするメソッド
+		/// </summary>
+		/// <param name="direction">ソート方向。Noneの場合は何もしない。</param>
+		/// <param name="propertyName">ソートに使用するプロパティ名。Nullの場合は要素自身をキーとしてソート。</param>
+		public void Sort(SortingDirection direction, string? propertyName = null)
+		{
+			Sort(direction, GetPropertyComparer(propertyName));
+		}
+
+		/// <summary>
+		/// 自身をソートするメソッド
+		/// </summary>
+		/// <param name="direction">ソート方向。Noneの場合は何もしない。</param>
+		/// <param name="comparer">要素同士の比較を提供するComparer</param>
+		public void Sort(SortingDirection direction, IComparer<T> comparer)
+		{
+			Sync.UpgradeableReadWithLock(() => {
+				switch(direction) {
+					case SortingDirection.Ascending:
+						QuickSort(0, this.Count - 1, comparer);
+						break;
+					case SortingDirection.Descending:
+						QuickSort(0, this.Count - 1, new InvertComparer(comparer));
+						break;
+				}
+			});
+		}
+
+		private void QuickSort(int left, int right, IComparer<T> comparer)
+		{
+			do {
+				int i = left;
+				int j = right;
+				T pivot = this[(i + j) >> 1];
+				do {
+					while(i < this.Count && comparer.Compare(this[i], pivot) < 0) i++;
+					while(j >= 0 && comparer.Compare(this[j], pivot) > 0) j--;
+					if(i > j) break;
+					if(i < j) {
+						this.Move(j, i);
+						this.Move(i + 1, j);
+					}
+					i++;
+					j--;
+				} while(i <= j);
+				if(j - left <= right - i) {
+					if(left < j) QuickSort(left, j, comparer);
+					left = i;
+				} else {
+					if(i < right) QuickSort(i, right, comparer);
+					right = j;
+				}
+			} while(left < right);
+		}
+
+		private IComparer<T> GetPropertyComparer(string? propertyName)
+		{
+			System.Collections.IComparer? comparer = null;
+
+			if(propertyName != null)
+				propertyComparerDictionary.TryGetValue(propertyName, out comparer);
+
+			return new PropertyComparator(propertyName, comparer);
+		}
+
+		private IComparer<T> GetPropertyComparer(string? propertyName, SortingDirection direction)
+		{
+			switch(direction) {
+				case SortingDirection.Ascending:
+					return GetPropertyComparer(propertyName);
+				case SortingDirection.Descending:
+					return new InvertComparer(GetPropertyComparer(propertyName));
+				default:
+					throw new ArgumentException($"{nameof(direction)} must be Ascending or Descending", nameof(direction));
+			}
+		}
+
+		private IComparer<T> GetPropertyComparer(SortingCondition condition) => GetPropertyComparer(condition.PropertyName, condition.Direction);
+
+		private class InvertComparer : IComparer<T>
+		{
+			readonly IComparer<T> original;
+
+			public InvertComparer(IComparer<T> original)
+			{
+				this.original = original;
+			}
+
+#if (NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER)
+			public int Compare([AllowNull] T x, [AllowNull] T y)
+#else
+			public int Compare(T x, T y)
+#endif
+			{
+				return -1 * original.Compare(x, y);
+			}
+		}
+
+		private class PropertyComparator : IComparer<T>
+		{
+			readonly PropertyInfo? property;
+			readonly System.Collections.IComparer? comparer;
+
+			public PropertyComparator(string? propertyName = null, System.Collections.IComparer? comparer = null)
+			{
+				this.comparer = comparer;
+
+				if(propertyName == null)
+					property = null;
+				else
+					property = typeof(T).GetProperty(propertyName) ?? throw new ArgumentException($@"Property ""{propertyName}"" doesn't exist.");				
+			}
+
+#if(NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER)
+			public int Compare([AllowNull] T x, [AllowNull] T y)
+#else
+			public int Compare(T x, T y)
+#endif
+			{
+				object? px, py;
+
+				if(property != null) {
+					px = property.GetValue(x);
+					py = property.GetValue(y);
+				} else {
+					px = x;
+					py = y;
+				}
+
+				if(comparer == null)
+					return (px is IComparable xc && py is IComparable yc) ? xc.CompareTo(yc) : 0;
+				else
+					return comparer.Compare(px, py);
+			}
+		}
+
+		#endregion
 
 		/// <summary>
 		/// コレクションの順番が変わったかもしれないときにこのメソッドを呼び出します。
@@ -106,22 +249,8 @@ namespace ListViewExtensions.Models
 			if(condition.IsNone || this.Count <= 1)
 				return true;    //条件が無かったり個数が1個以下だったらソートされているといえる
 
-			var property = typeof(T).GetProperty(condition.PropertyName) ?? throw new ArgumentException($"{nameof(condition)}.{nameof(condition.PropertyName)} is not found.", nameof(condition));
-			var properties = Sync.ReadWithLock(() => this.Select(p => property.GetValue(p)).ToArray());
-			var compare = properties.Zip(properties.Skip(1), (x, y) => CompareProperty(x, y, condition.PropertyName));
-
-			Func<int, bool> predicate = p => true;
-
-			switch(condition.Direction) {
-				case SortingDirection.Ascending:
-					predicate = p => p <= 0;
-					break;
-				case SortingDirection.Descending:
-					predicate = p => p >= 0;
-					break;
-			}
-
-			return compare.All(predicate);
+			var comparer = GetPropertyComparer(condition);
+			return Sync.ReadWithLock(() => this.Zip(this.Skip(1), (x, y) => comparer.Compare(x, y)).All(p => p <= 0));
 		}
 
 		/// <summary>
@@ -133,17 +262,31 @@ namespace ListViewExtensions.Models
 		public void AddAsSorted(T item)
 		{
 			Sync.UpgradeableReadWithLock(() => {
-				if(SortingCondition.IsNone) //ソートされていなかったら
+				if(SortingCondition.IsNone || this.Count == 0)	//ソートされていない、もしくは要素数が0だったらそのまま追加
 					Add(item);
 				else {
-					var property = typeof(T).GetProperty(SortingCondition.PropertyName) ?? throw new ArgumentException($"{nameof(SortingCondition)}.{nameof(SortingCondition.PropertyName)} is not found.");
-					var index = this
-						.Concat([item])
-						.OrderByDirection(p => property.GetValue(p), SortingCondition.Direction, Comparer<object?>.Create((x, y) => CompareProperty(x, y, SortingCondition.PropertyName)))
-						.ToList()
-						.IndexOf(item);
+					var comparer = GetPropertyComparer(SortingCondition);
 
-					Insert(index, item);
+					int left = 0, right = this.Count - 1;
+					int target;
+					do {
+						if(comparer.Compare(item, this[left]) < 0) {
+							target = left;
+							break;
+						}
+						if(comparer.Compare(item, this[right]) > 0) {
+							target = right + 1;
+							break;
+						}
+
+						int half = (left + right) / 2;
+						if(comparer.Compare(item, this[half]) < 0)
+							right = half - 1;
+						else
+							left = half + 1;
+					} while(true);
+
+					Insert(target, item);
 				}
 			});
 		}

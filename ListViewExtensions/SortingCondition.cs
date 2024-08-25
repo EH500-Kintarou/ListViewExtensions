@@ -11,10 +11,16 @@ namespace ListViewExtensions
 		/// <summary>
 		/// ソート条件なしとして初期化します
 		/// </summary>
-		public SortingCondition()
+		public SortingCondition() : this(SortingDirection.None) { }
+
+		/// <summary>
+		/// 要素そのものをキーとしてソート条件を指定し初期化します。
+		/// </summary>
+		/// <param name="direction"></param>
+		public SortingCondition(SortingDirection direction)
 		{
-			PropertyName = string.Empty;
-			Direction = SortingDirection.None;
+			PropertyName = null;
+			Direction = direction;
 		}
 
 		/// <summary>
@@ -24,22 +30,18 @@ namespace ListViewExtensions
 		/// <param name="direction">ソート方向</param>
 		public SortingCondition(string propertyName, SortingDirection direction)
 		{
-			if(direction == SortingDirection.None) {
-				PropertyName = string.Empty;
-				Direction = SortingDirection.None;
-			} else {
-				if(string.IsNullOrEmpty(propertyName))
-					throw new ArgumentNullException(nameof(propertyName));
-
+			if(direction == SortingDirection.None)
+				PropertyName = null;
+			else
 				PropertyName = propertyName;
-				Direction = direction;
-			}
+
+			Direction = direction;
 		}
 
 		/// <summary>
 		/// プロパティ名
 		/// </summary>
-		public string PropertyName { get; }
+		public string? PropertyName { get; }
 
 		/// <summary>
 		/// ソート方向
@@ -60,7 +62,11 @@ namespace ListViewExtensions
 
 		public override int GetHashCode()
 		{
-			return PropertyName.GetHashCode();
+			var hash = Direction.GetHashCode();
+			if(PropertyName != null)
+				hash ^= PropertyName.GetHashCode();
+
+			return hash;
 		}
 
 		public bool Equals(SortingCondition? other)

@@ -100,9 +100,9 @@ namespace ListViewExtensions.ViewModels
 						SafetySourceAccessIfAvailable(() => {
 							CommandTaskRunning = true;
 							if(SortingCondition.PropertyName == propertyName && SortingCondition.Direction == SortingDirection.Ascending)
-								Source.Sort(propertyName, SortingDirection.Descending);
+								Source.Sort(SortingDirection.Descending, propertyName);
 							else
-								Source.Sort(propertyName, SortingDirection.Ascending);
+								Source.Sort(SortingDirection.Ascending, propertyName);
 							CommandTaskRunning = false;
 						});
 				}

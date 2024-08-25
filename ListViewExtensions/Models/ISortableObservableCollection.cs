@@ -29,12 +29,15 @@ namespace ListViewExtensions.Models
 		/// <param name="newIndex">項目の新しい場所を指定する、0から始まるインデックス。</param>
 		void Move(int oldIndex, int newIndex);
 
-		/// <summary>
-		/// 自身をソートします。
-		/// </summary>
-		/// <param name="propertyName">ソートするプロパティ名</param>
-		/// <param name="direction">ソートする方向</param>
+		[Obsolete]
 		void Sort(string propertyName, SortingDirection direction);
+
+		/// <summary>
+		/// 自身をソートするメソッド
+		/// </summary>
+		/// <param name="direction">ソート方向。Noneの場合は何もしない。</param>
+		/// <param name="propertyName">ソートに使用するプロパティ名。Nullの場合は要素自身をキーとしてソート。</param>
+		void Sort(SortingDirection direction, string? propertyName = null);
 
 		/// <summary>
 		/// 現在のソート条件
