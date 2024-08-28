@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 
 namespace ListViewExtensions.Views.Controls
 {
+	[Obsolete]
     public class SortedHeader : ContentControl
     {
 		Polygon? AscendingArrow;
