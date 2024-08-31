@@ -56,31 +56,18 @@
 		</StackPanel>
 
 		<ListView ItemsSource="{Binding People}" >
-			<ListView.Resources>
-				<lv:SortingConditionConverter x:Key="ConditionToDirectionConverter" />
-			</ListView.Resources>
 			<ListView.View>
                 <GridView>
-                    <GridViewColumn Width="120" DisplayMemberBinding="{Binding Name}">
-                        <lv:SortableGridViewColumnHeader Content="Name" SortingArrowLocation="Right" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Name'}"
-                                                         Command="{Binding People.SortByPropertyCommand}" CommandParameter="Name"/>
-                    </GridViewColumn>
-					<GridViewColumn Width="150" DisplayMemberBinding="{Binding Pronunciation}" >
-                        <lv:SortableGridViewColumnHeader Content="Pronunciation" SortingArrowLocation="Right" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Pronunciation'}"
-                                                         Command="{Binding People.SortByPropertyCommand}" CommandParameter="Pronunciation"/>
-					</GridViewColumn>
-					<GridViewColumn Width="70" DisplayMemberBinding="{Binding Age}" >
-                        <lv:SortableGridViewColumnHeader Content="Age" SortingArrowLocation="Right" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Age'}"
-                                                         Command="{Binding People.SortByPropertyCommand}" CommandParameter="Age"/>
-					</GridViewColumn>
-					<GridViewColumn Width="120" DisplayMemberBinding="{Binding Birthday}" >
-                        <lv:SortableGridViewColumnHeader Content="Birthday" SortingArrowLocation="Right" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Birthday'}"
-                                                         Command="{Binding People.SortByPropertyCommand}" CommandParameter="Birthday"/>
-					</GridViewColumn>
-					<GridViewColumn Width="100" DisplayMemberBinding="{Binding Height}" >
-                        <lv:SortableGridViewColumnHeader Content="Height" SortingArrowLocation="Right" SortingDirection="{Binding People.SortingCondition, Mode=OneWay, Converter={StaticResource ConditionToDirectionConverter}, ConverterParameter='Height'}"
-                                                         Command="{Binding People.SortByPropertyCommand}" CommandParameter="Height"/>
-                    </GridViewColumn>
+                    <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Name}" Header="Name" />
+                    <lv:SortableGridViewColumn Width="150" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Pronunciation}" Header="Pronunciation" />
+                    <lv:SortableGridViewColumn Width="70"  SortableSource="{Binding People}" DisplayMemberBinding="{Binding Age}" Header="Age"  />
+                    <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Birthday}" Header="Birthday"  />
+                    <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Height}" Header="Height"  />                    
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="lv:SortableGridViewColumnHeader">
+                            <Setter Property="SortingArrowLocation" Value="Top" />
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
 				</GridView>
 			</ListView.View>
 			<ListView.ItemContainerStyle>

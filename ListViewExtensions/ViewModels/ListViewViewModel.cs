@@ -20,7 +20,7 @@ namespace ListViewExtensions.ViewModels
 	/// </summary>
 	/// <typeparam name="TViewModel">ViewModelの型</typeparam>
 	/// <typeparam name="TModel">対応するModelの型</typeparam>
-	public class ListViewViewModel<TViewModel, TModel> : ReadOnlyUIObservableCollection<TViewModel, TModel>
+	public class ListViewViewModel<TViewModel, TModel> : ReadOnlyUIObservableCollection<TViewModel, TModel>, IListViewViewModel<TViewModel>
 	{
 		ISortableObservableCollection<TModel> Source;
 
