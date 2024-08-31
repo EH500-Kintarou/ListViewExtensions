@@ -5,7 +5,7 @@
     <LangVersion>12</LangVersion>
 	<UseWPF>true</UseWPF>
     <Title>ListView Extensions</Title>
-    <Description>The library which supports the implementation of the MVVM pattern in WPF ListView.</Description>
+    <Description>The library which provides the easy implement of sorting, selection, right-clicking, double-clicking of ListView for all aspects of View, ViewModel and Model.</Description>
 	<Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
 	<Company>EH500_Kintarou</Company>
 	<Authors>EH500_Kintarou</Authors>
@@ -15,6 +15,14 @@
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<Nullable>enable</Nullable>
+	<PackageTags>WPF;ListView;MVVM</PackageTags>
+	<PackageProjectUrl>https://github.com/EH500-Kintarou/ListViewExtensions</PackageProjectUrl>
+	<PackageReleaseNotes>- ターゲットを.NET Framework 4.5.2 / .NET Core 3.1 / .NET 6に変更
+- ListViewのヘッダーサポートを強化
+  - SortableGridViewColumnHeader、SortableGridViewColumnを追加
+  - SortedHeaderをObsolete指定にした
+- ISortableObservableCollectionのSortメソッドの引数を変更、古いメソッドはObsolete指定にした
+- コードのリファクタリング、Nullableの有効化、単体テストの追加など</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
