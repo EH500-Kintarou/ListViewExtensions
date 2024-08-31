@@ -1,4 +1,4 @@
-[English Readme is here](README-en.md)
+[English Readme is here](https://github.com/EH500-Kintarou/ListViewExtensions/blob/master/README-en.md)
 
 # ListView Extensions
 WPFのListViewは効果的にコレクションの内容を表示することができますが、ヘッダーをクリックしてソートしたり、右クリックやダブルクリック、選択したアイテムの取得などの機能を実装するととたんに難しくなります。  

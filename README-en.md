@@ -1,4 +1,4 @@
-[Japanese Readme is here](README.md)
+[Japanese Readme is here](https://github.com/EH500-Kintarou/ListViewExtensions/blob/master/README.md)
 
 # ListView Extensions
 WPF ListView can effectively show the contents of a collection, however it's hard to implement functions such as sorting by clicking on the header, right-clicking, double-clicking, and retrieving the selected items.  
