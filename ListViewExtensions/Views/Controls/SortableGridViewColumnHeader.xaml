@@ -63,25 +63,10 @@
                                 <Border Padding="{TemplateBinding Padding}" Grid.RowSpan="2">
                                     <DockPanel x:Name="HeaderContentPane" Margin="0,0,0,1" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                                         <Grid DockPanel.Dock="{TemplateBinding SortingArrowLocation}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding SortingArrowMargin}">
-                                            <Polygon Points="0,4 4,0 8,4" StrokeThickness="0" 
-                                                     Visibility="{TemplateBinding SortingDirection, Converter={StaticResource VisibilityConverter}, ConverterParameter={x:Static local:SortingDirection.Ascending}}">
-                                                <Polygon.Fill>
-                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                        <GradientStop Offset="0.0" Color="Black" />
-                                                        <GradientStop Offset="1.0" Color="SkyBlue" />
-                                                    </LinearGradientBrush>
-                                                </Polygon.Fill>
-                                            </Polygon>
-
-                                            <Polygon Points="0,0 4,4 8,0" StrokeThickness="0"
-                                                     Visibility="{TemplateBinding SortingDirection, Converter={StaticResource VisibilityConverter}, ConverterParameter={x:Static local:SortingDirection.Descending}}" >
-                                                <Polygon.Fill>
-                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                        <GradientStop Offset="0.0" Color="Black" />
-                                                        <GradientStop Offset="1.0" Color="SkyBlue" />
-                                                    </LinearGradientBrush>
-                                                </Polygon.Fill>
-                                            </Polygon>
+                                            <ctrl:AscendingArrow HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                 Visibility="{TemplateBinding SortingDirection, Converter={StaticResource VisibilityConverter}, ConverterParameter={x:Static local:SortingDirection.Ascending}}" />
+                                            <ctrl:DescendingArrow HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                  Visibility="{TemplateBinding SortingDirection, Converter={StaticResource VisibilityConverter}, ConverterParameter={x:Static local:SortingDirection.Descending}}" />
                                         </Grid>
 
                                         <ContentPresenter x:Name="HeaderContent" RecognizesAccessKey="True" HorizontalAlignment="Center" VerticalAlignment="Center"/>

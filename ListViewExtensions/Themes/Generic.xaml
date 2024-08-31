@@ -36,5 +36,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ListViewExtensions;component/Views/Controls/SortableGridViewColumnHeader.xaml" />
+        <ResourceDictionary Source="ListViewExtensions;component/Views/Controls/AscendingArrow.xaml" />
+        <ResourceDictionary Source="ListViewExtensions;component/Views/Controls/DescendingArrow.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
