@@ -29,7 +29,7 @@ namespace ListViewExtensions
 		/// </summary>
 		/// <param name="propertyName">ソートに使うプロパティ名</param>
 		/// <param name="direction">ソート方向</param>
-		public SortingCondition(string propertyName, SortingDirection direction)
+		public SortingCondition(string? propertyName, SortingDirection direction)
 		{
 			if(direction == SortingDirection.None)
 				PropertyName = null;
@@ -78,6 +78,9 @@ namespace ListViewExtensions
 		{
 			return this.PropertyName == other.PropertyName && this.Direction == other.Direction;
 		}
+
+		public static bool operator ==(SortingCondition left, SortingCondition right) => left.Equals(right);
+		public static bool operator !=(SortingCondition left, SortingCondition right) => !left.Equals(right);
 
 		#endregion
 

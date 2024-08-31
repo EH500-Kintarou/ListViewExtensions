@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -22,13 +23,23 @@ namespace ListViewExtensions.ViewModels
 	/// <typeparam name="TModel">対応するModelの型</typeparam>
 	public class ListViewViewModel<TViewModel, TModel> : ReadOnlyUIObservableCollection<TViewModel, TModel>, IListViewViewModel<TViewModel>
 	{
-		ISortableObservableCollection<TModel> Source;
+		readonly ISortableObservableCollection<TModel> Source;
+		readonly Dictionary<string, string> PropertyNameDictionary;
+		readonly Dictionary<string, string> PropertyNameBackDictionary;
 
 		#region Constructor
 
-		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher) : this(source, converter, dispatcher, DispatcherPriority.Normal) { }
+		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher)
+			: this(source, converter, new Dictionary<string, string>(), dispatcher) { }
 
-		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority) : base(source, converter, dispatcher, priority)
+		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority)
+			: this(source, converter, new Dictionary<string, string>(), dispatcher, priority) { }
+
+		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> itemConverter, IReadOnlyDictionary<string, string> propertyNameDictionary, Dispatcher dispatcher)
+			: this(source, itemConverter, propertyNameDictionary, dispatcher, DispatcherPriority.Normal) { }
+
+		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> itemConverter, IReadOnlyDictionary<string, string> propertyNameDictionary, Dispatcher dispatcher, DispatcherPriority priority)
+			: base(source, itemConverter, dispatcher, priority)
 		{
 			Source = source;
 			Source.PropertyChanged += Source_PropertyChanged;
@@ -37,6 +48,16 @@ namespace ListViewExtensions.ViewModels
 			UseNonUIThreadWhenCallingModel = false;
 			DisableCommandWhenCommandTaskRunning = false;
 			CommandTaskRunning = false;
+
+			PropertyNameDictionary = new Dictionary<string, string>();
+			PropertyNameBackDictionary = new Dictionary<string, string>();
+			foreach(var item in propertyNameDictionary) {
+				var key = item.Key;
+				var value = item.Value;
+
+				PropertyNameDictionary.Add(key, value);
+				PropertyNameBackDictionary.Add(value, key);
+			}
 
 			//Commandの初期化
 			RemoveSelectedItemCommand = new Command(
@@ -100,9 +121,9 @@ namespace ListViewExtensions.ViewModels
 						SafetySourceAccessIfAvailable(() => {
 							CommandTaskRunning = true;
 							if(SortingCondition.PropertyName == propertyName && SortingCondition.Direction == SortingDirection.Ascending)
-								Source.Sort(SortingDirection.Descending, propertyName);
+								Source.Sort(SortingDirection.Descending, PropertyNameBackConverter(propertyName));
 							else
-								Source.Sort(SortingDirection.Ascending, propertyName);
+								Source.Sort(SortingDirection.Ascending, PropertyNameBackConverter(propertyName));
 							CommandTaskRunning = false;
 						});
 				}
@@ -125,9 +146,30 @@ namespace ListViewExtensions.ViewModels
 		{
 			switch(e.PropertyName) {
 				case nameof(Source.SortingCondition):
-					this.SortingCondition = Source.SortingCondition;
+					this.SortingCondition = new SortingCondition(PropertyNameConverter(Source.SortingCondition.PropertyName), Source.SortingCondition.Direction);
 					break;
 			}
+		}
+#if(NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER)
+		[return: NotNullIfNotNull(nameof(propertyName))]
+#endif
+		private string? PropertyNameConverter(string? propertyName)
+		{
+			if(propertyName != null && PropertyNameDictionary.TryGetValue(propertyName, out var ret))
+				return ret;
+			else
+				return propertyName;
+		}
+
+#if(NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER)
+		[return: NotNullIfNotNull(nameof(propertyName))]
+#endif
+		private string? PropertyNameBackConverter(string? propertyName)
+		{
+			if(propertyName != null && PropertyNameBackDictionary.TryGetValue(propertyName, out var ret))
+				return ret;
+			else
+				return propertyName;
 		}
 
 		#endregion
