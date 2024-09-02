@@ -50,43 +50,6 @@ namespace ListViewExtensions.Models
 
 		#region Sorting Core
 
-		#region Obsolete
-
-		[Obsolete(@"Call ""Sort(SortingDirection, string?)"" instead of this method")]
-		public void Sort(string propertyName, SortingDirection direction)
-		{
-			if(direction == SortingDirection.None)
-				throw new ArgumentException($"\"{nameof(direction)}\" must not be None.");
-
-			var property = typeof(T).GetProperty(propertyName) ?? throw new ArgumentException($"\"{propertyName}\" doesn't exist.");
-
-			Sync.UpgradeableReadWithLock(() => {
-				var Sorted = this.OrderByDirection(p => property.GetValue(p), direction, Comparer<object?>.Create((x, y) => CompareProperty(x, y, propertyName))).ToArray();
-				Sync.WriteWithLock(() => {
-					for(int i = 0; i < Sorted.Length; i++) {
-						int oldindex = this.IndexOf(Sorted[i], i);
-
-						if(oldindex < i)
-							throw new InvalidOperationException("ソートしたらデータが消えてる…だと…？");
-						else if(oldindex > i)
-							this.Move(oldindex, i);
-					}
-					SortingCondition = new SortingCondition(propertyName, direction);
-				});
-			});
-		}
-
-		[Obsolete(@"Call ""Sort(SortingDirection, IComparer<T>)"" to implement custom sorting")]
-		protected virtual int CompareProperty(object? x, object? y, string propertyName)
-		{
-			if(x is IComparable xc && y is IComparable yc)
-				return xc.CompareTo(yc);
-			else
-				return 0;
-		}
-
-		#endregion
-
 		/// <summary>
 		/// 自身をソートするメソッド
 		/// </summary>
