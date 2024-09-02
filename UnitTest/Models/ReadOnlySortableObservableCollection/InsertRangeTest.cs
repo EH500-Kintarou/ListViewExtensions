@@ -9,21 +9,23 @@ using System.Text;
 using System.Threading.Tasks;
 using UnitTest.Models.ObservableCollectionTestBase;
 
-namespace UnitTest.Models.SyncedObservableCollection
+namespace UnitTest.Models.ReadOnlySortableObservableCollection
 {
 	[TestClass]
 	public class InsertRangeTest : InsertRangeTestBase
 	{
 		protected override (SyncedObservableCollection<T> writer, IReadOnlyList<T> reader, INotifyCollectionChanged watcher) TargetFactory<T>()
 		{
-			var target = new SyncedObservableCollection<T>();
-			return (target, target, target);
+			var target = new SortableObservableCollection<T>();
+			var reader = new ReadOnlySortableObservableCollection<T>(target);
+			return (target, reader, reader);
 		}
 
 		protected override (List<T> writer, IReadOnlyList<T> reader) ModelFactory<T>()
 		{
 			var model = new List<T>();
-			return (model, model);
+			var reader = new ReadOnlyCollection<T>(model);
+			return (model, reader);
 		}
 	}
 }

@@ -9,21 +9,25 @@ using System.Text;
 using System.Threading.Tasks;
 using UnitTest.Models.ObservableCollectionTestBase;
 
-namespace UnitTest.Models.SyncedObservableCollection
+namespace UnitTest.Models.ReadOnlySortableObservableCollection
 {
 	[TestClass]
-	public class ClearTest : ClearTestBase
+	public class RemoveAtTest : RemoveAtTestBase
 	{
 		protected override (IList<T> writer, IReadOnlyList<T> reader, INotifyCollectionChanged watcher) TargetFactory<T>(IList<T> items)
 		{
-			var target = new SyncedObservableCollection<T>(items);
-			return (target, target, target);
+			var target = new SortableObservableCollection<T>(items);
+			var reader = new ReadOnlySortableObservableCollection<T>(target);
+
+			return (target, reader, reader);
 		}
 
 		protected override (IList<T> writer, IReadOnlyList<T> reader, INotifyCollectionChanged watcher) ModelFactory<T>(IList<T> items)
 		{
 			var model = new ObservableCollection<T>(items);
-			return (model, model, model);
+			var reader = new ReadOnlyObservableCollection<T>(model);
+
+			return (model, reader, reader);
 		}
 	}
 }

@@ -2,28 +2,23 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnitTest.Models.ObservableCollectionTestBase;
 
-namespace UnitTest.Models.SyncedObservableCollection
+namespace UnitTest.Models.ReadOnlySortableObservableCollection
 {
 	[TestClass]
-	public class MoveRangeTest : MoveRangeTestBase
+	public class RemoveRangeTest : RemoveRangeTestBase
 	{
 		protected override (SyncedObservableCollection<T> writer, IReadOnlyList<T> reader, INotifyCollectionChanged watcher) TargetFactory<T>(IList<T> items)
 		{
-			var target = new SyncedObservableCollection<T>(items);
-			return (target, target, target);
-		}
+			var target = new SortableObservableCollection<T>(items);
+			var reader = new ReadOnlySortableObservableCollection<T>(target);
 
-		protected override (ObservableCollection<T> writer, IReadOnlyList<T> reader, INotifyCollectionChanged watcher) ModelFactory<T>(IList<T> items)
-		{
-			var model = new ObservableCollection<T>(items);
-			return (model, model, model);
+			return (target, reader, reader);
 		}
 	}
 }
