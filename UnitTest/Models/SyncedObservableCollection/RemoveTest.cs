@@ -7,61 +7,23 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnitTest.Models.ObservableCollectionTestBase;
 
 namespace UnitTest.Models.SyncedObservableCollection
 {
 	[TestClass]
-	public class RemoveTest
+	public class RemoveTest : RemoveTestBase
 	{
-		[TestMethod]
-		public void RemoveTestInt()
-		{
-			RemoveTestInternal([1, 2, 3, 4, 5]);
-		}
-
-		[TestMethod]
-		public void RemoveTestString()
-		{
-			RemoveTestInternal(["hoge", "foo", "bar"]);
-		}
-
-		static void RemoveTestInternal<T>(IList<T> items)
+		protected override (IList<T> writer, IReadOnlyList<T> reader, INotifyCollectionChanged watcher) TargetFactory<T>(IList<T> items)
 		{
 			var target = new SyncedObservableCollection<T>(items);
-			var model = new ObservableCollection<T>(items);
-
-			var tt = new RemoveEventTest<T>(items);
-			var mt = new RemoveEventTest<T>(items);
-			target.CollectionChanged += tt.EventListener;
-			model.CollectionChanged += mt.EventListener;
-
-			foreach(var item in items) {
-				target.Remove(item);
-				model.Remove(item);
-			}
-
-			CollectionAssert.AreEqual(new T[0], target);
-			CollectionAssert.AreEqual(new T[0], model);
-			Assert.AreEqual(items.Count, tt.Count);
-			Assert.AreEqual(items.Count, mt.Count);
+			return (target, target, target);
 		}
 
-		class RemoveEventTest<T> : NotifyCollectionChangedEventBase<T>
+		protected override (IList<T> writer, IReadOnlyList<T> reader, INotifyCollectionChanged watcher) ModelFactory<T>(IList<T> items)
 		{
-			public RemoveEventTest(IList<T> Itemsed) : base(Itemsed) { }
-
-			public override void EventListener(object? sender, NotifyCollectionChangedEventArgs e)
-			{
-				Assert.AreEqual(NotifyCollectionChangedAction.Remove, e.Action);
-				Assert.AreEqual(0, e.OldStartingIndex);
-				Assert.AreEqual(-1, e.NewStartingIndex);
-				Assert.IsNotNull(e.OldItems);
-				Assert.IsNull(e.NewItems);
-				Assert.AreEqual(1, e.OldItems.Count);
-				Assert.AreEqual(items[count], e.OldItems[0]);
-
-				count++;
-			}
+			var model = new ObservableCollection<T>(items);
+			return (model, model, model);
 		}
 	}
 }

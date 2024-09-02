@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnitTest.Models.SyncedObservableCollection
+namespace UnitTest.Models.ObservableCollectionTestBase
 {
 	internal abstract class NotifyCollectionChangedEventBase<T>
 	{
