@@ -4,7 +4,7 @@
 WPFのListViewは効果的にコレクションの内容を表示することができますが、ヘッダーをクリックしてソートしたり、右クリックやダブルクリック、選択したアイテムの取得などの機能を実装するととたんに難しくなります。  
 ListView Extensionsは、そのようなListViewのポテンシャルを簡単に引き出すために、View / ViewModel / Modelの各面からサポートをするライブラリです。
 
-![](https://img.shields.io/badge/Nuget-1.1.0-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-1.2.0-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.5.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Core-3.1-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6-orange?logo=.net&style=plastic)
@@ -24,7 +24,7 @@ ListView Extensionsは、そのようなListViewのポテンシャルを簡単�
 
 ## 使用方法
 ### 1. Nugetからインストール
-![](https://img.shields.io/badge/Nuget-1.1.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions
+![](https://img.shields.io/badge/Nuget-1.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions
 
 ### 2. XAML名前空間を設定
 XAMLで名前空間 "http://schemas.eh500-kintarou.com/ListViewExtensions" を設定します。
@@ -74,11 +74,17 @@ People = new ListViewViewModel<PersonViewModel, PersonModel>(model.People, perso
 このリポジトリにはサンプルコードが含まれています。 [サンプルコード](https://github.com/EH500-Kintarou/ListViewExtensions/tree/master/Sample) を見ることでより理解が深まります。
 
 ## プロジェクトURL
-![](https://img.shields.io/badge/Github-1.1.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/ListViewExtensions  
-![](https://img.shields.io/badge/Nuget-1.1.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions  
-![](https://img.shields.io/badge/Blogger-1.1.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/ListView%20Extensions
+![](https://img.shields.io/badge/Github-1.2.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/ListViewExtensions  
+![](https://img.shields.io/badge/Nuget-1.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions  
+![](https://img.shields.io/badge/Blogger-1.2.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/ListView%20Extensions
 
 ## バージョン履歴
+### ver.1.2.0 (2024/09/03)
+- IReadOnlySortableObservableCollectionインターフェースとReadOnlySortableObservableCollectionクラスを追加
+  - ISortableObservableCollectionインターフェースはIReadOnlySortableObservableCollectionインターフェースを継承するようにした
+  - ListViewViewModelのコンストラクタに与えるソースコレクションをIReadOnlySortableObservableCollectionにした
+- ListViewViewModelに単一の型引数を取るオーバーロードを追加
+
 ### ver.1.1.0 (2024/08/31)
 - ターゲットを.NET Framework 4.5.2 / .NET Core 3.1 / .NET 6に変更
 - ListViewのヘッダーサポートを強化

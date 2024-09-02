@@ -9,7 +9,7 @@
 	<Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
 	<Company>EH500_Kintarou</Company>
 	<Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>1.1.0</VersionPrefix>
+	<VersionPrefix>1.2.0</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<RepositoryUrl>https://github.com/EH500-Kintarou/ListViewExtensions</RepositoryUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -17,12 +17,10 @@
 	<Nullable>enable</Nullable>
 	<PackageTags>WPF;ListView;MVVM</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/ListViewExtensions</PackageProjectUrl>
-	<PackageReleaseNotes>- ターゲットを.NET Framework 4.5.2 / .NET Core 3.1 / .NET 6に変更
-- ListViewのヘッダーサポートを強化
-  - SortableGridViewColumnHeader、SortableGridViewColumnを追加
-  - SortedHeaderをObsolete指定にした
-- ISortableObservableCollectionのSortメソッドの引数を変更、古いメソッドはObsolete指定にした
-- コードのリファクタリング、Nullableの有効化、単体テストの追加など</PackageReleaseNotes>
+	<PackageReleaseNotes>- IReadOnlySortableObservableCollectionインターフェースとReadOnlySortableObservableCollectionクラスを追加
+  - ISortableObservableCollectionインターフェースはIReadOnlySortableObservableCollectionインターフェースを継承するようにした
+  - ListViewViewModelのコンストラクタに与えるソースコレクションをIReadOnlySortableObservableCollectionにした
+- ListViewViewModelに単一の型引数を取るオーバーロードを追加</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

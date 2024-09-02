@@ -4,7 +4,7 @@
 WPF ListView can effectively show the contents of a collection, however it's hard to implement functions such as sorting by clicking on the header, right-clicking, double-clicking, and retrieving the selected items.  
 ListView Extensions is a library that provides the support to easily implement above functions of ListView for all aspects of View, ViewModel and Model.
 
-![](https://img.shields.io/badge/Nuget-1.1.0-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-1.2.0-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.5.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Core-3.1-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6-orange?logo=.net&style=plastic)
@@ -24,7 +24,7 @@ ListView Extensions is a library that provides the support to easily implement a
 
 ## Getting Started
 ### 1. Get via Nuget
-![](https://img.shields.io/badge/Nuget-1.1.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions
+![](https://img.shields.io/badge/Nuget-1.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions
 
 ### 2. Add XAML namespace
 Add namespace of "http://schemas.eh500-kintarou.com/ListViewExtensions" into your XAML code.
@@ -74,11 +74,17 @@ People = new ListViewViewModel<PersonViewModel, PersonModel>(model.People, perso
 This repository contains [a sample project](https://github.com/EH500-Kintarou/ListViewExtensions/tree/master/Sample). It will make you more clear how to use it.
 
 ## Project URL
-![](https://img.shields.io/badge/Github-1.1.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/ListViewExtensions  
-![](https://img.shields.io/badge/Nuget-1.1.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions  
-![](https://img.shields.io/badge/Blogger-1.1.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/ListView%20Extensions
+![](https://img.shields.io/badge/Github-1.2.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/ListViewExtensions  
+![](https://img.shields.io/badge/Nuget-1.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions  
+![](https://img.shields.io/badge/Blogger-1.2.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/ListView%20Extensions
 
 ## Version History
+### ver.1.2.0 (03-September-2024)
+- Added IReadOnlySortableObservableCollection interface and ReadOnlySortableObservableCollection class
+  - Changed that ISortableObservableCollection interface inherits IReadOnlySortableObservableCollection interface
+  - Type of the source collection which is given to the constractor of ListViewViewModel is changed to IReadOnlySortableObservableCollection
+- Added the overload which receives single type parameter to ListViewViewModel
+
 ### ver.1.1.0 (31-August-2024)
 - Target framework was changed to .NET Framework 4.5.2, .NET Core 3.1 and .NET 6
 - Improved ListView header support
