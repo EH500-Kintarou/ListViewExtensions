@@ -19,6 +19,17 @@ namespace ListViewExtensions.ViewModels
 	/// <summary>
 	/// ListViewの汎用ViewModel
 	/// </summary>
+	/// <typeparam name="T">Model / ViewModelの型</typeparam>
+	public class ListViewViewModel<T> : ListViewViewModel<T, T>
+	{
+		public ListViewViewModel(ISortableObservableCollection<T> source, Dispatcher dispatcher) : base(source, p => p, dispatcher) { }
+
+		public ListViewViewModel(ISortableObservableCollection<T> source, Dispatcher dispatcher, DispatcherPriority priority) : base(source, p => p, dispatcher, priority) { }
+	}
+
+	/// <summary>
+	/// ListViewの汎用ViewModel
+	/// </summary>
 	/// <typeparam name="TViewModel">ViewModelの型</typeparam>
 	/// <typeparam name="TModel">対応するModelの型</typeparam>
 	public class ListViewViewModel<TViewModel, TModel> : ReadOnlyUIObservableCollection<TViewModel, TModel>, IListViewViewModel<TViewModel>
