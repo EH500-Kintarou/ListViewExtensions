@@ -22,9 +22,9 @@ namespace ListViewExtensions.ViewModels
 	/// <typeparam name="T">Model / ViewModelの型</typeparam>
 	public class ListViewViewModel<T> : ListViewViewModel<T, T>
 	{
-		public ListViewViewModel(ISortableObservableCollection<T> source, Dispatcher dispatcher) : base(source, p => p, dispatcher) { }
+		public ListViewViewModel(IReadOnlySortableObservableCollection<T> source, Dispatcher dispatcher) : base(source, p => p, dispatcher) { }
 
-		public ListViewViewModel(ISortableObservableCollection<T> source, Dispatcher dispatcher, DispatcherPriority priority) : base(source, p => p, dispatcher, priority) { }
+		public ListViewViewModel(IReadOnlySortableObservableCollection<T> source, Dispatcher dispatcher, DispatcherPriority priority) : base(source, p => p, dispatcher, priority) { }
 	}
 
 	/// <summary>
