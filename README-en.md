@@ -35,7 +35,7 @@ Add namespace of "http://schemas.eh500-kintarou.com/ListViewExtensions" into you
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-		xmlns:lv="http://schemas.eh500-kintarou.com/ListViewExtensions"
+        xmlns:lv="http://schemas.eh500-kintarou.com/ListViewExtensions"
         Title="MainWindow" Height="480" Width="640">
 ```
 
@@ -44,15 +44,15 @@ Create ListView in the View. Add SortableGridViewColumn instead of GridViewColum
 
 ```xaml
 <ListView ItemsSource="{Binding People}" >
-	<ListView.View>
+    <ListView.View>
         <GridView>
             <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Name}" Header="Name" />
             <lv:SortableGridViewColumn Width="150" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Pronunciation}" Header="Pronunciation" />
             <lv:SortableGridViewColumn Width="70"  SortableSource="{Binding People}" DisplayMemberBinding="{Binding Age}" Header="Age" />
             <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Birthday}" Header="Birthday" />
             <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Height}" Header="Height" />
-		</GridView>
-	</ListView.View>
+        </GridView>
+    </ListView.View>
 </ListView>
 ```
 
