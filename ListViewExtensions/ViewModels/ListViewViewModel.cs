@@ -23,22 +23,22 @@ namespace ListViewExtensions.ViewModels
 	/// <typeparam name="TModel">対応するModelの型</typeparam>
 	public class ListViewViewModel<TViewModel, TModel> : ReadOnlyUIObservableCollection<TViewModel, TModel>, IListViewViewModel<TViewModel>
 	{
-		readonly ISortableObservableCollection<TModel> Source;
+		readonly IReadOnlySortableObservableCollection<TModel> Source;
 		readonly Dictionary<string, string> PropertyNameDictionary;
 		readonly Dictionary<string, string> PropertyNameBackDictionary;
 
 		#region Constructor
 
-		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher)
+		public ListViewViewModel(IReadOnlySortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher)
 			: this(source, converter, new Dictionary<string, string>(), dispatcher) { }
 
-		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority)
+		public ListViewViewModel(IReadOnlySortableObservableCollection<TModel> source, Func<TModel, TViewModel> converter, Dispatcher dispatcher, DispatcherPriority priority)
 			: this(source, converter, new Dictionary<string, string>(), dispatcher, priority) { }
 
-		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> itemConverter, IReadOnlyDictionary<string, string> propertyNameDictionary, Dispatcher dispatcher)
+		public ListViewViewModel(IReadOnlySortableObservableCollection<TModel> source, Func<TModel, TViewModel> itemConverter, IReadOnlyDictionary<string, string> propertyNameDictionary, Dispatcher dispatcher)
 			: this(source, itemConverter, propertyNameDictionary, dispatcher, DispatcherPriority.Normal) { }
 
-		public ListViewViewModel(ISortableObservableCollection<TModel> source, Func<TModel, TViewModel> itemConverter, IReadOnlyDictionary<string, string> propertyNameDictionary, Dispatcher dispatcher, DispatcherPriority priority)
+		public ListViewViewModel(IReadOnlySortableObservableCollection<TModel> source, Func<TModel, TViewModel> itemConverter, IReadOnlyDictionary<string, string> propertyNameDictionary, Dispatcher dispatcher, DispatcherPriority priority)
 			: base(source, itemConverter, dispatcher, priority)
 		{
 			Source = source;
@@ -64,15 +64,20 @@ namespace ListViewExtensions.ViewModels
 				() => SelectedItems.Count > 0
 						&& !(DisableCommandWhenCommandTaskRunning && CommandTaskRunning),
 				() => SafetySourceAccessIfAvailable(() => {
-					CommandTaskRunning = true;					
-					if(Source is SyncedObservableCollection<TModel> syncedCollection) { //RemoveRangeの活用
-						foreach(var indeces in SelectedItems.Select(p => this.IndexOf(p)).OrderBy(p => p).Distinct().Split((p, n) => p + 1 != n).Select(p => p.ToArray()).Reverse().ToArray())
-							syncedCollection.RemoveRange(indeces[0], indeces.Length);
-					} else {					
-						foreach(var selected in SelectedItems.ToArray())
-							Source.RemoveAt(this.IndexOf(selected));
+					try {
+						CommandTaskRunning = true;
+						if(Source is SyncedObservableCollection<TModel> sourceAsSyncedCollection) { //RemoveRangeの活用
+							foreach(var indeces in SelectedItems.Select(p => this.IndexOf(p)).OrderBy(p => p).Distinct().Split((p, n) => p + 1 != n).Select(p => p.ToArray()).Reverse().ToArray())
+								sourceAsSyncedCollection.RemoveRange(indeces[0], indeces.Length);
+						} else if(Source is IList<TModel> sourceAsList) {
+							foreach(var selected in SelectedItems.ToArray())
+								sourceAsList.RemoveAt(this.IndexOf(selected));
+						} else
+							throw new InvalidOperationException("Source collection is readonly.");
 					}
-					CommandTaskRunning = false;
+					finally {
+						CommandTaskRunning = false;
+					}
 				})
 			);
 
@@ -198,6 +203,7 @@ namespace ListViewExtensions.ViewModels
 
 		/// <summary>
 		/// 選択中の項目を削除するコマンド
+		/// このコマンドを実行するには、ListVIewViewModelのコンストラクタに与えるsourceを書き込み可能なコレクションにする必要があります。
 		/// </summary>
 		public ICommand RemoveSelectedItemCommand { get; }
 
