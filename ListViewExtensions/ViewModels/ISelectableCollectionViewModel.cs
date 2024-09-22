@@ -36,18 +36,12 @@ namespace ListViewExtensions.ViewModels
 		/// <summary>
 		/// ListView.SelectedItemsにバインディングして現在の選択中のアイテムを知らせます
 		/// </summary>
-		System.Collections.IList? SelectedItemsSetter
-		{
-			set;
-		}
+		System.Collections.IList SelectedItemsSetter { get; }
 
 		/// <summary>
 		/// 選択中の項目をIListじゃ使いにくいから使いやすくミラーリングしたクラス
 		/// </summary>
-		public ReadOnlyObservableCollection<T> SelectedItems
-		{
-			get;
-		}
+		public ReadOnlyObservableCollection<T> SelectedItems { get; }
 
 		/// <summary>
 		/// 指定したアイテムを選択します
