@@ -27,7 +27,6 @@ namespace Sample.ViewModels
 			model = MainWindowModel.GetInstance();
 
 			People = new ListViewViewModel<PersonViewModel, PersonModel>(model.People, person => new PersonViewModel(person), new Dictionary<string, string>() { { nameof(PersonModel.Height_cm), nameof(PersonViewModel.Height) } }, DispatcherHelper.UIDispatcher);
-			Messenger.Raise(new InteractionMessage("SelectedItemsMirroring"));
 		}
 
 		public void Add()
