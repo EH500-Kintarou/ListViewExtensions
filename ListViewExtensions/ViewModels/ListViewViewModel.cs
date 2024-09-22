@@ -60,6 +60,11 @@ namespace ListViewExtensions.ViewModels
 			DisableCommandWhenCommandTaskRunning = false;
 			CommandTaskRunning = false;
 
+			_SelectedItemsSetter = new ObservableCollection<TViewModel>();
+			SelectedItemsSetter = _SelectedItemsSetter;
+			SelectedItems = new ReadOnlyObservableCollection<TViewModel>(_SelectedItemsSetter);
+			((INotifyCollectionChanged)SelectedItems).CollectionChanged += SelectedItems_CollectionChanged;
+
 			PropertyNameDictionary = new Dictionary<string, string>();
 			PropertyNameBackDictionary = new Dictionary<string, string>();
 			foreach(var item in propertyNameDictionary) {
@@ -242,85 +247,22 @@ namespace ListViewExtensions.ViewModels
 
 		#region Selection
 
-		#region SelectedItemsSetter変更通知プロパティ
+		/// <summary>
+		/// SelectedItemsWatcher添付プロパティ経由でListViewのSelectedItemsにバインディングするプロパティ
+		/// </summary>
+		public System.Collections.IList SelectedItemsSetter { get; }
+		readonly ObservableCollection<TViewModel> _SelectedItemsSetter;
 
 		/// <summary>
-		/// ListView.SelectedItemsにバインディングして現在の選択中のアイテムを知らせます
+		/// 選択中の項目（ListView.SelectedItemsのミラーリング）
 		/// </summary>
-		public System.Collections.IList? SelectedItemsSetter
+		public ReadOnlyObservableCollection<TViewModel> SelectedItems { get; }
+
+		private void SelectedItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
 		{
-			//get { return _SelectedItems; }
-			set
-			{
-				if(_SelectedItemsSetter == value)
-					return;
-
-				if(_SelectedItemsSetter is INotifyCollectionChanged notifyCollectionChanged)
-					notifyCollectionChanged.CollectionChanged -= SelectedItemsSetter_CollectionChanged;
-				_SelectedItems.Clear();
-
-				_SelectedItemsSetter = value;
-
-				if(_SelectedItemsSetter != null) {
-					foreach(var selected in _SelectedItemsSetter.Cast<TViewModel>())
-						_SelectedItems.Add(selected);
-					if(_SelectedItemsSetter is INotifyCollectionChanged)
-						((INotifyCollectionChanged)_SelectedItemsSetter).CollectionChanged += SelectedItemsSetter_CollectionChanged;
-				}
-
-				RaisePropertyChanged(nameof(SelectedItemsSetter));
-				RaiseRemoveSelectedItemCanExecuteChanged();
-				RaiseMoveSelectedItemCanExecuteChanged();
-			}
-		}
-		private System.Collections.IList? _SelectedItemsSetter;
-
-		#endregion
-
-		private void SelectedItemsSetter_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-		{
-			switch(e.Action) {
-				case NotifyCollectionChangedAction.Add:
-					_SelectedItems.InsertRange(e.NewStartingIndex, e.NewItems?.Cast<TViewModel>() ?? []);
-					break;
-				case NotifyCollectionChangedAction.Move:
-					_SelectedItems.Move(e.OldStartingIndex, e.NewStartingIndex);
-					break;
-				case NotifyCollectionChangedAction.Remove:
-					if(e.OldItems != null) {
-						foreach(var r in e.OldItems)
-							_SelectedItems.RemoveAt(e.OldStartingIndex);
-					}
-					break;
-				case NotifyCollectionChangedAction.Replace:
-					foreach(var r in e.OldItems?.Cast<TViewModel>()?.Zip(e.NewItems?.Cast<TViewModel>() ?? [], (o, n) => new { Old = o, New = n }) ?? [])
-						_SelectedItems[_SelectedItems.IndexOf(r.Old)] = r.New;
-					break;
-				case NotifyCollectionChangedAction.Reset:
-					_SelectedItems.Clear();
-					_SelectedItems.AddRange(e.NewItems?.Cast<TViewModel>() ?? Enumerable.Empty<TViewModel>());
-					break;
-			}
-
 			RaiseRemoveSelectedItemCanExecuteChanged();
 			RaiseMoveSelectedItemCanExecuteChanged();
 		}
-
-		readonly ObservableCollection<TViewModel> _SelectedItems = new ObservableCollection<TViewModel>();
-
-		/// <summary>
-		/// 選択中の項目をIListじゃ使いにくいから使いやすくミラーリングしたクラス
-		/// </summary>
-		public ReadOnlyObservableCollection<TViewModel> SelectedItems
-		{
-			get
-			{
-				if(_ReadOnlySelectedItems == null)
-					_ReadOnlySelectedItems = new ReadOnlyObservableCollection<TViewModel>(_SelectedItems);
-				return _ReadOnlySelectedItems;
-			}
-		}
-		private ReadOnlyObservableCollection<TViewModel>? _ReadOnlySelectedItems;
 
 		#region Methods that change selection
 
@@ -334,15 +276,13 @@ namespace ListViewExtensions.ViewModels
 				throw new ArgumentNullException(nameof(item));
 			if(!this.Contains(item))
 				throw new ArgumentException("This collection doesn't contain the item.", nameof(item));
-			if(_SelectedItems.Contains(item))
+			if(_SelectedItemsSetter.Contains(item))
 				throw new InvalidOperationException("Already selected.");
-			if(_SelectedItemsSetter == null)
-				throw new InvalidOperationException($"{nameof(_SelectedItemsSetter)} is not set yet.");
 
 			if(Dispatcher.CheckAccess())
 				_SelectedItemsSetter.Add(item);
 			else
-				Dispatcher.Invoke(DispatcherPriority, (Action)(() => _SelectedItemsSetter.Add(item)));
+				Dispatcher.Invoke(DispatcherPriority,(() => _SelectedItemsSetter.Add(item)));
 		}
 
 		/// <summary>
@@ -361,10 +301,8 @@ namespace ListViewExtensions.ViewModels
 				throw new ArgumentNullException(nameof(item));
 			if(!this.Contains(item))
 				throw new ArgumentException("This collection doesn't contain the item,");
-			if(!_SelectedItems.Contains(item))
+			if(!_SelectedItemsSetter.Contains(item))
 				throw new InvalidOperationException("Already selected.");
-			if(_SelectedItemsSetter == null)
-				throw new InvalidOperationException($"{nameof(_SelectedItemsSetter)} is not set yet.");
 
 			if(Dispatcher.CheckAccess())
 				_SelectedItemsSetter.Remove(item);
@@ -389,7 +327,7 @@ namespace ListViewExtensions.ViewModels
 				throw new ArgumentNullException(nameof(item));
 			if(!this.Contains(item))
 				throw new ArgumentException("This collection doesn't contain the item,");
-			return _SelectedItems.Contains(item);
+			return _SelectedItemsSetter.Contains(item);
 		}
 
 		/// <summary>

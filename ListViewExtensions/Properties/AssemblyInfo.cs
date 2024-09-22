@@ -6,7 +6,7 @@ using System.Windows.Markup;
 // このような SDK スタイルのプロジェクトの場合、以前はこのファイルで定義していたいくつかのアセンブリ属性がビルド時に自動的に追加されて、プロジェクトのプロパティで定義されている値がそれに設定されるようになりました。組み込まれる属性と、このプロセスをカスタマイズする方法の詳細については、次を参照してください:
 // https://aka.ms/assembly-info-properties
 
-[assembly: XmlnsDefinition("http://schemas.eh500-kintarou.com/ListViewExtensions", "ListViewExtensions.Views.Actions")]
+[assembly: XmlnsDefinition("http://schemas.eh500-kintarou.com/ListViewExtensions", "ListViewExtensions.Views.Behaviors")]
 [assembly: XmlnsDefinition("http://schemas.eh500-kintarou.com/ListViewExtensions", "ListViewExtensions.Views.Controls")]
 [assembly: XmlnsDefinition("http://schemas.eh500-kintarou.com/ListViewExtensions", "ListViewExtensions.Views.Converters")]
 [assembly: XmlnsDefinition("http://schemas.eh500-kintarou.com/ListViewExtensions", "ListViewExtensions.Views.AttachedProperties")]

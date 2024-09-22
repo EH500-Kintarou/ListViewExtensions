@@ -55,7 +55,7 @@
 			<Button Margin="0,0,10,0" Content="Toggle Selection" Width="110" Command="{Binding People.ToggleSelectionCommand}" />
 		</StackPanel>
 
-		<ListView ItemsSource="{Binding People}" >
+        <ListView ItemsSource="{Binding People}" lv:SelectedItemsSync.Source="{Binding People.SelectedItemsSetter}" >
 			<ListView.View>
                 <GridView>
                     <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Name}" Header="Name" />
@@ -85,11 +85,6 @@
 					<Setter Property="lv:DoubleClickBehavior.MethodName" Value="DoubleClicked" />
 				</Style>
 			</ListView.ItemContainerStyle>
-			<i:Interaction.Triggers>
-				<l:InteractionMessageTrigger Messenger="{Binding Messenger}" MessageKey="SelectedItemsMirroring" >
-					<lv:ListViewSelectedItemsAction Source="{Binding People.SelectedItemsSetter}" />
-				</l:InteractionMessageTrigger>
-			</i:Interaction.Triggers>
 		</ListView>
 	</DockPanel>
 </Window>
