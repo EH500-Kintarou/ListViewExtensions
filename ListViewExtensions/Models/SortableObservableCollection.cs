@@ -173,7 +173,7 @@ namespace ListViewExtensions.Models
 
 						PropertyInfo? prop;
 						if(type.IsInterface)
-							prop = type.GetInterfaces().Select(p => p.GetProperty(propname)).SingleOrDefault(p => p != null);
+							prop = new[] { type.GetProperty(propname) }.Concat(type.GetInterfaces().Select(p => p.GetProperty(propname))).FirstOrDefault(p => p != null);
 						else
 							prop = type.GetProperty(propname);
 
