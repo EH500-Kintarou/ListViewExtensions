@@ -55,14 +55,17 @@ namespace ListViewExtensions.Views.Behaviors
 
 		private void ListView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
 		{
-			// 割り切って順番は関係なく中身のみで同期する
-			foreach(var item in e.AddedItems ?? new object[0]) {
-				if(!_collection.Contains(item))
-					_collection.Add(item);
-			}
+			// SelectionChangedはRoutedEventなので、ListViewの子要素にComboBoxなどがあるとイベントが発生してしまうため、自身のSelectionChangedだけを選んで処理する。
+			if(e.OriginalSource == _listView) {
+				// 割り切って順番は関係なく中身のみで同期する
+				foreach(var item in e.AddedItems ?? new object[0]) {
+					if(!_collection.Contains(item))
+						_collection.Add(item);
+				}
 
-			foreach(var item in e.RemovedItems ?? new object[0])
-				_collection.Remove(item);
+				foreach(var item in e.RemovedItems ?? new object[0])
+					_collection.Remove(item);
+			}
 		}
 	}
 }

@@ -13,6 +13,7 @@ namespace ListViewExtensions.Views.Behaviors
 {
 	public class SelectedItemsSync
 	{
+		#region SelectedValueBinder attached property
 		private static SelectedItemsBinder GetSelectedValueBinder(DependencyObject obj)
 		{
 			return (SelectedItemsBinder)obj.GetValue(SelectedValueBinderProperty);
@@ -21,8 +22,12 @@ namespace ListViewExtensions.Views.Behaviors
 		{
 			obj.SetValue(SelectedValueBinderProperty, items);
 		}
-		private static readonly DependencyProperty SelectedValueBinderProperty = DependencyProperty.RegisterAttached("SelectedValueBinder", typeof(SelectedItemsBinder), typeof(SelectedItemsSync));
+		private static readonly DependencyProperty SelectedValueBinderProperty =
+			DependencyProperty.RegisterAttached("SelectedValueBinder", typeof(SelectedItemsBinder), typeof(SelectedItemsSync));
 
+		#endregion
+
+		#region Souce attached property
 
 		public static void SetSource(DependencyObject obj, IList value)
 		{
@@ -32,8 +37,10 @@ namespace ListViewExtensions.Views.Behaviors
 		{
 			return (IList)obj.GetValue(SouceProperty);
 		}
-		public static readonly DependencyProperty SouceProperty = DependencyProperty.RegisterAttached("Source", typeof(IList), typeof(SelectedItemsSync),
-			new FrameworkPropertyMetadata(null, OnSelectedValuesChanged));
+		public static readonly DependencyProperty SouceProperty =
+			DependencyProperty.RegisterAttached("Source", typeof(IList), typeof(SelectedItemsSync), new FrameworkPropertyMetadata(null, OnSelectedValuesChanged));
+
+		#endregion
 
 		private static void OnSelectedValuesChanged(DependencyObject o, DependencyPropertyChangedEventArgs value)
 		{
