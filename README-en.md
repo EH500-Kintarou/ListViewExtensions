@@ -4,7 +4,7 @@
 WPF ListView can effectively show the contents of a collection, however it's hard to implement functions such as sorting by clicking on the header, right-clicking, double-clicking, and retrieving the selected items.  
 ListView Extensions is a library that provides the support to easily implement above functions of ListView for all aspects of View, ViewModel and Model.
 
-![](https://img.shields.io/badge/Nuget-1.3.0-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-1.3.1-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.5.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Core-3.1-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6-orange?logo=.net&style=plastic)
@@ -24,7 +24,7 @@ ListView Extensions is a library that provides the support to easily implement a
 
 ## Getting Started
 ### 1. Get via Nuget
-![](https://img.shields.io/badge/Nuget-1.3.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions
+![](https://img.shields.io/badge/Nuget-1.3.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions
 
 ### 2. Add XAML namespace
 Add namespace of "http://schemas.eh500-kintarou.com/ListViewExtensions" into your XAML code.
@@ -76,11 +76,17 @@ People = new ListViewViewModel<PersonViewModel, PersonModel>(model.People, perso
 This repository contains [a sample project](https://github.com/EH500-Kintarou/ListViewExtensions/tree/master/Sample). It will make you more clear how to use it.
 
 ## Project URL
-![](https://img.shields.io/badge/Github-1.3.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/ListViewExtensions  
-![](https://img.shields.io/badge/Nuget-1.3.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions  
-![](https://img.shields.io/badge/Blogger-1.3.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/ListView%20Extensions
+![](https://img.shields.io/badge/Github-1.3.1-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/ListViewExtensions  
+![](https://img.shields.io/badge/Nuget-1.3.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/ListViewExtensions  
+![](https://img.shields.io/badge/Blogger-1.3.1-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/ListView%20Extensions
 
 ## Version History
+### ver.1.3.1 (29-September-2024)
+- Changed nested property name to be accepted as a sorting key.
+- Added "SortingMemberPath" Property in SortableGridViewColumn which is treated as a path of a soring key. The value of DisplayMemberBindings property is used as before if this property is not set.
+- Fixed PropertyChanged event is not fired when the indexer and Count property are changed on the class inherits ReadOnlyUIObservableCollection including ListViewViewModel.
+- Fixed ArgumentException is thrown if there is a ComboBox and so on in the element of ListView and its selection is changed.
+
 ### ver.1.3.0 (23-September-2024)
 - Selection synchronization is performed by the SelectedItemsSync.Source attached property instead of ListViewSelectedItemsAction.
 - SortedHeader class was removed, which had an Obsolete attribute.
