@@ -26,7 +26,7 @@ namespace Sample.ViewModels
 		{
 			model = MainWindowModel.GetInstance();
 
-			People = new ListViewViewModel<PersonViewModel, PersonModel>(model.People, person => new PersonViewModel(person), new Dictionary<string, string>() { { nameof(PersonModel.Height_cm), nameof(PersonViewModel.Height) } }, DispatcherHelper.UIDispatcher);
+			People = new ListViewViewModel<PersonViewModel, PersonModel>(model.People, person => new PersonViewModel(person), DispatcherHelper.UIDispatcher);
 		}
 
 		public void Add()
