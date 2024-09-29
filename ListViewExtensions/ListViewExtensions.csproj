@@ -9,7 +9,7 @@
 	<Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
 	<Company>EH500_Kintarou</Company>
 	<Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>1.3.0</VersionPrefix>
+	<VersionPrefix>1.3.1</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<RepositoryUrl>https://github.com/EH500-Kintarou/ListViewExtensions</RepositoryUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -17,8 +17,10 @@
 	<Nullable>enable</Nullable>
 	<PackageTags>WPF;ListView;MVVM</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/ListViewExtensions</PackageProjectUrl>
-	<PackageReleaseNotes>- 選択項目の同期をListViewSelectedItemsActionからSelectedItemsSync.Source添付プロパティ経由で行うようにした。
-- Obsolete指定していたSortedHeaderを削除</PackageReleaseNotes>
+	<PackageReleaseNotes>- Changed nested property name to be accepted as a sorting key.
+- Added "SortingMemberPath" Property in SortableGridViewColumn which is treated as a path of a soring key. The value of DisplayMemberBindings property is used as before if this property is not set.
+- Fixed PropertyChanged event is not fired when the indexer and Count property are changed on the class inherits ReadOnlyUIObservableCollection including ListViewViewModel.
+- Fixed ArgumentException is thrown if there is a ComboBox and so on in the element of ListView and its selection is changed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
