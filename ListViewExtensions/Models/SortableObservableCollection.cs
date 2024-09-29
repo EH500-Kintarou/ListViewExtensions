@@ -155,7 +155,7 @@ namespace ListViewExtensions.Models
 
 		private class PropertyComparator : IComparer<T>
 		{
-			readonly PropertyInfo? property;
+			readonly PropertyInfo[] properties;
 			readonly System.Collections.IComparer? comparer;
 
 			public PropertyComparator(string? propertyName = null, System.Collections.IComparer? comparer = null)
@@ -163,9 +163,32 @@ namespace ListViewExtensions.Models
 				this.comparer = comparer;
 
 				if(propertyName == null)
-					property = null;
-				else
-					property = typeof(T).GetProperty(propertyName) ?? throw new ArgumentException($@"Property ""{propertyName}"" doesn't exist.");				
+					properties = [];
+				else {
+					var type = typeof(T);
+					var splitted = propertyName.Split('.');
+					properties = new PropertyInfo[splitted.Length];
+					for(int i = 0; i < splitted.Length; i++) {
+						var propname = splitted[i];
+
+						var prop = type.GetProperty(propname) ?? throw new ArgumentException($@"Property ""{propname}"" doesn't exist in type of ""{type.ToString()}"".", nameof(propertyName));
+						if(!prop.CanRead) throw new ArgumentException($@"Property ""{propname}"" cannot be read.", nameof(propertyName));
+
+						properties[i] = prop;
+						type = prop.PropertyType;
+					}
+				}
+			}
+
+			private object? GetPropertyValue(T? target)
+			{
+				object? propvalue = target;
+				foreach(var prop in properties) {
+					if(propvalue == null)
+						break;
+					propvalue = prop.GetValue(propvalue);
+				}
+				return propvalue;
 			}
 
 #if(NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER)
@@ -174,20 +197,13 @@ namespace ListViewExtensions.Models
 			public int Compare(T x, T y)
 #endif
 			{
-				object? px, py;
+				var px = GetPropertyValue(x);
+				var py = GetPropertyValue(y);
 
-				if(property != null) {
-					px = property.GetValue(x);
-					py = property.GetValue(y);
-				} else {
-					px = x;
-					py = y;
-				}
-
-				if(comparer == null)
-					return (px is IComparable xc && py is IComparable yc) ? xc.CompareTo(yc) : 0;
-				else
+				if(comparer != null)
 					return comparer.Compare(px, py);
+				else
+					return (px is IComparable xc && py is IComparable yc) ? xc.CompareTo(yc) : 0;
 			}
 		}
 
