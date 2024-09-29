@@ -17,68 +17,61 @@ namespace Sample.ViewModels
 {
 	public class PersonViewModel : ViewModel
 	{
-		PersonModel Source;
+		readonly PersonModel model;
 
-		public PersonViewModel(PersonModel source)
+		public PersonViewModel(PersonModel model)
 		{
-			Source = source;
-			Source.PropertyChanged += Source_PropertyChanged;
+			this.model = model;
+
+			if(model.Name != null) {
+				Name = new NameViewModel(model.Name);
+				Name.PropertyChanged += Name_PropertyChanged;
+			}
+
+			model.PropertyChanged += Model_PropertyChanged;
 		}
 
-		private void Source_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+		private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
 			switch(e.PropertyName) {
-				case nameof(Source.Name):
-					RaisePropertyChanged(nameof(this.Name));
+				case nameof(Name):
+					if(Name != null)
+						Name.PropertyChanged -= Name_PropertyChanged;
+					Name = null;
+					if(model.Name != null) {
+						Name = new NameViewModel(model.Name);
+						Name.PropertyChanged += Name_PropertyChanged;
+					}
 					break;
-				case nameof(Source.Pronunciation):
-					RaisePropertyChanged(nameof(this.Pronunciation));
+				case nameof(model.Age):
+					RaisePropertyChanged(nameof(Age));
 					break;
-				case nameof(Source.Age):
-					RaisePropertyChanged(nameof(this.Age));
+				case nameof(model.Birthday):
+					RaisePropertyChanged(nameof(Birthday));
 					break;
-				case nameof(Source.Birthday):
-					RaisePropertyChanged(nameof(this.Birthday));
-					break;
-				case nameof(Source.Height_cm):
-					RaisePropertyChanged(nameof(this.Height));
+				case nameof(model.Height_cm):
+					RaisePropertyChanged(nameof(Height));
 					break;
 			}
 		}
 
-		public void Initialize()
+		private void Name_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
+			throw new NotImplementedException();
 		}
 
-		public string? Name
+		public NameViewModel? Name
 		{
-			get { return Source.Name; }
-			set { Source.Name = value; }
+			get => _Name;
+			set => RaisePropertyChangedIfSet(ref _Name, value);
 		}
+		NameViewModel? _Name;
 
-		public string? Pronunciation
-		{
-			get { return Source.Pronunciation; }
-			set { Source.Pronunciation = value; }
-		}
+		public string Age => $"{model.Age}歳";
 
-		public string Age
-		{
-			get { return $"{Source.Age}歳"; }
-			//set { Source.Age = value; }
-		}
+		public string Birthday => model.Birthday.ToShortDateString();
 
-		public string Birthday
-		{
-			get { return Source.Birthday.ToShortDateString(); }
-			//set { Source.Birthday = value; }
-		}
-
-		public string Height
-		{
-			get { return $"{Source.Height_cm}cm"; }
-			//set { Source.Height_cm = value; }
-		}
+		public string Height => $"{model.Height_cm}cm";
 
 		#region IncrementAgeCommand
 
@@ -86,7 +79,7 @@ namespace Sample.ViewModels
 		{
 			get
 			{
-				_IncrementAgeCommand ??= new ViewModelCommand(() => Source.IncrementAge());
+				_IncrementAgeCommand ??= new ViewModelCommand(model.IncrementAge);
 				return _IncrementAgeCommand;
 			}
 		}
@@ -100,7 +93,7 @@ namespace Sample.ViewModels
 		{
 			get
 			{
-				_DecrementAgeCommand ??= new ViewModelCommand(() => Source.DecrementAge());
+				_DecrementAgeCommand ??= new ViewModelCommand(model.DecrementAge);
 				return _DecrementAgeCommand;
 			}
 		}
@@ -115,7 +108,7 @@ namespace Sample.ViewModels
 		protected override void Dispose(bool disposing)
 		{
 			if(disposing)
-				Source.PropertyChanged -= Source_PropertyChanged;
+				model.PropertyChanged -= Model_PropertyChanged;
 			
 			base.Dispose(disposing);
 		}
