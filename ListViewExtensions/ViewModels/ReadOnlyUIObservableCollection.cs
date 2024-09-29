@@ -14,6 +14,7 @@ namespace ListViewExtensions.ViewModels
 {
 	public class ReadOnlyUIObservableCollection<TViewModel, TModel> : IReadOnlyList<TViewModel>, IReadOnlyCollection<TViewModel>, INotifyCollectionChanged, INotifyPropertyChanged, IDisposable
 	{
+		const string IndexerName = "Item[]";
 		readonly IEnumerable<TModel> Source;
 		readonly INotifyCollectionChanged SourceAsNotifyCollectionChanged;
 		readonly UIObservableCollection<TViewModel> Target;
@@ -45,10 +46,16 @@ namespace ListViewExtensions.ViewModels
 		{
 			switch(e.PropertyName) {
 				case nameof(Target.Dispatcher):
-					RaisePropertyChanged(nameof(this.Dispatcher));
+					RaisePropertyChanged(nameof(Dispatcher));
 					break;
 				case nameof(Target.DispatcherPriority):
-					RaisePropertyChanged(nameof(this.DispatcherPriority));
+					RaisePropertyChanged(nameof(DispatcherPriority));
+					break;
+				case IndexerName:
+					RaisePropertyChanged(IndexerName);
+					break;
+				case nameof(Target.Count):
+					RaisePropertyChanged(nameof(Count));
 					break;
 			}
 		}
