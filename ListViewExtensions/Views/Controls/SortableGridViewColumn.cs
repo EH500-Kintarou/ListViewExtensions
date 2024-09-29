@@ -42,7 +42,8 @@ namespace ListViewExtensions.Views.Controls
 			var oldHeader = e.OldValue as SortableGridViewColumnHeader;
 			var newHeader = e.NewValue as SortableGridViewColumnHeader;
 			var src = me.SortableSource;
-			var member = me.DisplayMemberBinding as Binding;
+			var sortingmember = me.SortingMemberPath;
+			var displaymember = me.DisplayMemberBinding as Binding;
 
 			if(src != null && oldHeader != null)
 				DetachSortableSource(src, oldHeader);
@@ -51,8 +52,10 @@ namespace ListViewExtensions.Views.Controls
 				newHeader = new SortableGridViewColumnHeader() { Content = e.NewValue };
 			baseme.Header = newHeader;
 
-			if(src != null && member != null)
-				AttachSortableSource(src, newHeader, member.Path.Path);
+			if(src != null && !string.IsNullOrEmpty(sortingmember))
+				AttachSortableSource(src, newHeader, sortingmember);
+			else if(src != null && displaymember != null)
+				AttachSortableSource(src, newHeader, displaymember.Path.Path);
 		}
 
 		#endregion
@@ -75,13 +78,47 @@ namespace ListViewExtensions.Views.Controls
 			var oldsrc = e.OldValue as ISortableCollectionViewModel;
 			var newsrc = e.NewValue as ISortableCollectionViewModel;
 			var header = baseme.Header as SortableGridViewColumnHeader;
-			var member = me.DisplayMemberBinding as Binding;
+			var sortingmember = me.SortingMemberPath;
+			var displaymember = me.DisplayMemberBinding as Binding;
 
 			if(oldsrc != null && header != null)
-				DetachSortableSource(oldsrc, header);			
+				DetachSortableSource(oldsrc, header);
 
-			if(newsrc != null && header != null && member != null)
-				AttachSortableSource(newsrc, header, member.Path.Path);
+			if(newsrc != null && header != null && !string.IsNullOrEmpty(sortingmember))
+				AttachSortableSource(newsrc, header, sortingmember);
+			else if(newsrc != null && header != null && displaymember != null)
+				AttachSortableSource(newsrc, header, displaymember.Path.Path);
+		}
+
+		#endregion
+
+		#region SortingMemberPath Property
+
+		public string SortingMemberPath
+		{
+			get { return (string)GetValue(SortingMemberPathProperty); }
+			set { SetValue(SortingMemberPathProperty, value); }
+		}
+		public static readonly DependencyProperty SortingMemberPathProperty =
+			DependencyProperty.Register(nameof(SortingMemberPath), typeof(string), typeof(SortableGridViewColumn), new FrameworkPropertyMetadata(new PropertyChangedCallback(OnSortingMemberBindingsChanged)));
+
+		private static void OnSortingMemberBindingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var me = (SortableGridViewColumn)d;
+			var baseme = (GridViewColumn)d;
+
+			var src = me.SortableSource;
+			var header = baseme.Header as SortableGridViewColumnHeader;
+			var sortingmember = e.NewValue as string;
+			var displaymember = me.DisplayMemberBinding as Binding;
+
+			if(src != null && header != null)
+				DetachSortableSource(src, header);
+
+			if(src != null && header != null && !string.IsNullOrEmpty(sortingmember))
+				AttachSortableSource(src, header, sortingmember!);	// 古い.NETでNull推論が働かない
+			else if(src != null && header != null && displaymember != null)
+				AttachSortableSource(src, header, displaymember.Path.Path);
 		}
 
 		#endregion

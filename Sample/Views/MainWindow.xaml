@@ -62,7 +62,7 @@
                     <lv:SortableGridViewColumn Width="150" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Pronunciation}" Header="Pronunciation" />
                     <lv:SortableGridViewColumn Width="70"  SortableSource="{Binding People}" DisplayMemberBinding="{Binding Age}" Header="Age" />
                     <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Birthday}" Header="Birthday" />
-                    <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Height}" Header="Height" />
+                    <lv:SortableGridViewColumn Width="120" SortableSource="{Binding People}" DisplayMemberBinding="{Binding Height}" SortingMemberPath="Height_cm" Header="Height" />
                     <GridView.ColumnHeaderContainerStyle>
                         <Style TargetType="lv:SortableGridViewColumnHeader">
                             <Setter Property="SortingArrowLocation" Value="Top" />
