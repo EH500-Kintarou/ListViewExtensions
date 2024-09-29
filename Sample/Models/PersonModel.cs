@@ -11,18 +11,12 @@ namespace Sample.Models
 	{
 		#region Name変更通知プロパティ
 
-		public string? Name
+		public NameModel? Name
 		{
-			get { return _Name; }
-			set
-			{
-				if(_Name == value)
-					return;
-				_Name = value;
-				RaisePropertyChanged(nameof(Name));
-			}
+			get => _Name;
+			set => RaisePropertyChangedIfSet(ref _Name, value);
 		}
-		private string? _Name;
+		private NameModel? _Name;
 
 		#endregion
 
@@ -30,14 +24,8 @@ namespace Sample.Models
 
 		public string? Pronunciation
 		{
-			get { return _Pronunciation; }
-			set
-			{
-				if(_Pronunciation == value)
-					return;
-				_Pronunciation = value;
-				RaisePropertyChanged(nameof(Pronunciation));
-			}
+			get => _Pronunciation;
+			set => RaisePropertyChangedIfSet(ref _Pronunciation, value);
 		}
 		private string? _Pronunciation;
 
@@ -47,14 +35,8 @@ namespace Sample.Models
 
 		public int Age
 		{
-			get { return _Age; }
-			set
-			{
-				if(_Age == value)
-					return;
-				_Age = value;
-				RaisePropertyChanged(nameof(Age));
-			}
+			get => _Age;
+			set => RaisePropertyChangedIfSet(ref _Age, value);
 		}
 		private int _Age;
 
@@ -64,14 +46,8 @@ namespace Sample.Models
 
 		public DateTime Birthday
 		{
-			get { return _Birthday; }
-			set
-			{
-				if(_Birthday == value)
-					return;
-				_Birthday = value;
-				RaisePropertyChanged(nameof(Birthday));
-			}
+			get => _Birthday;
+			set => RaisePropertyChangedIfSet(ref _Birthday, value);
 		}
 		private DateTime _Birthday;
 
@@ -81,14 +57,8 @@ namespace Sample.Models
 
 		public int Height_cm
 		{
-			get { return _Height_cm; }
-			set
-			{ 
-				if(_Height_cm == value)
-					return;
-				_Height_cm = value;
-				RaisePropertyChanged(nameof(Height_cm));
-			}
+			get => _Height_cm;
+			set => RaisePropertyChangedIfSet(ref _Height_cm, value);
 		}
 		private int _Height_cm;
 
