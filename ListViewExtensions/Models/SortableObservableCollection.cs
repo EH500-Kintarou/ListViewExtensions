@@ -171,7 +171,14 @@ namespace ListViewExtensions.Models
 					for(int i = 0; i < splitted.Length; i++) {
 						var propname = splitted[i];
 
-						var prop = type.GetProperty(propname) ?? throw new ArgumentException($@"Property ""{propname}"" doesn't exist in type of ""{type.ToString()}"".", nameof(propertyName));
+						PropertyInfo? prop;
+						if(type.IsInterface)
+							prop = type.GetInterfaces().Select(p => p.GetProperty(propname)).SingleOrDefault(p => p != null);
+						else
+							prop = type.GetProperty(propname);
+
+						if(prop == null)
+							throw new ArgumentException($@"Property ""{propname}"" doesn't exist in type of ""{type.ToString()}"".", nameof(propertyName));
 						if(!prop.CanRead) throw new ArgumentException($@"Property ""{propname}"" cannot be read.", nameof(propertyName));
 
 						properties[i] = prop;
