@@ -24,11 +24,11 @@ namespace Sample.Models
 
 		Random random = new Random();
 		readonly PersonModel[] array = [
-			new PersonModel() { Name = "宮内 れんげ", Pronunciation = "みやうち れんげ"  , Birthday = new DateTime(2008, 12,  3), Age =  7, Height_cm = 139, },
-			new PersonModel() { Name = "一条 蛍"    , Pronunciation = "いちじょう ほたる", Birthday = new DateTime(2004,  5, 28), Age = 11, Height_cm = 164, },
-			new PersonModel() { Name = "越谷 夏海"  , Pronunciation = "こしがや なつみ"  , Birthday = new DateTime(2003,  1, 24), Age = 12, Height_cm = 155, },
-			new PersonModel() { Name = "越谷 小毬"  , Pronunciation = "こしがや こまり"  , Birthday = new DateTime(2001,  9, 14), Age = 14, Height_cm = 140, },
-			new PersonModel() { Name = "越谷 卓"    , Pronunciation = "こしがや すぐる"  , Birthday = new DateTime(2000,  4, 11), Age = 15, Height_cm = 171, },
+			new PersonModel() { Name = new NameModel() {Spell = "宮内 れんげ", Pronunciation = "みやうち れんげ"  }, Birthday = new DateTime(2008, 12,  3), Age =  7, Height_cm = 139, },
+			new PersonModel() { Name = new NameModel() {Spell = "一条 蛍"    , Pronunciation = "いちじょう ほたる"}, Birthday = new DateTime(2004,  5, 28), Age = 11, Height_cm = 164, },
+			new PersonModel() { Name = new NameModel() {Spell = "越谷 夏海"  , Pronunciation = "こしがや なつみ"  }, Birthday = new DateTime(2003,  1, 24), Age = 12, Height_cm = 155, },
+			new PersonModel() { Name = new NameModel() {Spell = "越谷 小毬"  , Pronunciation = "こしがや こまり"  }, Birthday = new DateTime(2001,  9, 14), Age = 14, Height_cm = 140, },
+			new PersonModel() { Name = new NameModel() {Spell = "越谷 卓"    , Pronunciation = "こしがや すぐる"  }, Birthday = new DateTime(2000,  4, 11), Age = 15, Height_cm = 171, },
 		];
 
 		public SortableObservableCollection<PersonModel> People { get; } = new SortableObservableCollection<PersonModel>();
